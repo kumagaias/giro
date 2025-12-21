@@ -3,10 +3,14 @@
   "mcpServers": {
     "fetch": {
       "command": "uvx",
-      "args": ["mcp-server-fetch"],
+      "args": [
+        "mcp-server-fetch"
+      ],
       "env": {},
       "disabled": false,
-      "autoApprove": ["fetch"]
+      "autoApprove": [
+        "fetch"
+      ]
     },
     "github": {
       "command": "sh",
@@ -37,9 +41,9 @@
         "get_pull_request_reviews",
         "update_issue",
         "get_pull_request_files",
-        "create_pull_request_review"
+        "create_pull_request_review",
+        "get_file_contents"
       ]
     }
   }
 }
-

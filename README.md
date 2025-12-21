@@ -5,9 +5,7 @@ Shared Kiro configuration for consistent development practices across projects.
 ## Quick Start
 
 ```bash
-# Download and run installer
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh -o /tmp/kiro-install.sh
-bash /tmp/kiro-install.sh
+curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
 ```
 
 ## Installation
@@ -26,11 +24,8 @@ brew install gitleaks
 ### 2. Run installer
 
 ```bash
-# Download installer
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh -o /tmp/kiro-install.sh
-
-# Run interactive installation
-bash /tmp/kiro-install.sh
+# One-line installation
+curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
 ```
 
 The installer will ask you to:
@@ -92,9 +87,8 @@ git commit -m "test: Verify setup" --allow-empty
 # Backup customizations
 cp -r .kiro .kiro.backup
 
-# Download and run installer
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh -o /tmp/kiro-install.sh
-bash /tmp/kiro-install.sh
+# Re-run installer
+curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
 
 # Restore customizations (merge manually)
 ```
