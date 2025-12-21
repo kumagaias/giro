@@ -199,21 +199,21 @@ echo "✅ Language configuration complete"
 echo ""
 echo "☁️  Hosting Platform"
 echo "  Select your hosting platform:"
-echo "    1) AWS (Lambda, API Gateway, DynamoDB, S3, CloudFront)"
-echo "    2) Platform (Vercel, Render, Railway, Forge, etc.)"
+echo "    1) None (Generic structure)"
+echo "    2) AWS (Lambda, API Gateway, DynamoDB, S3, CloudFront)"
 read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r HOSTING_CHOICE < /dev/tty
 echo ""
 
 case "$HOSTING_CHOICE" in
   2)
-    echo "  📝 Setting up default structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
-    echo "  ✅ Default structure template copied"
-    ;;
-  *)
     echo "  📝 Setting up AWS structure..."
     cp "$TARGET_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ AWS structure template copied"
+    ;;
+  *)
+    echo "  📝 Setting up default structure..."
+    cp "$TARGET_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
+    echo "  ✅ Default structure template copied"
     ;;
 esac
 echo ""
