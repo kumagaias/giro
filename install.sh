@@ -8,7 +8,7 @@
 
 set -e
 
-REPO_URL="https://github.com/your-org/giro"
+REPO_URL="https://github.com/kumagaias/giro"
 BRANCH="${KIRO_BRANCH:-main}"
 TEMP_DIR=$(mktemp -d)
 TARGET_DIR=".kiro"
