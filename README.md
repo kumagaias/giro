@@ -93,6 +93,19 @@ curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | ba
 # Restore customizations (merge manually)
 ```
 
+## Uninstalling
+
+```bash
+# One-line uninstallation
+curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/uninstall.sh | bash
+```
+
+This will remove:
+- `.kiro` directory
+- `.husky` symlink (if it's a symlink)
+- `.github` symlink (if it's a symlink)
+- Optionally: `Makefile` and `.tool-versions`
+
 ## Structure
 
 ```

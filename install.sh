@@ -302,19 +302,37 @@ rm -rf "$TEMP_DIR"
 # Setup Git hooks
 echo ""
 echo "🔗 Setting up Git hooks..."
-if [ -d "$TARGET_DIR/hooks/common/.husky" ]; then
+if [ -d "$TARGET_DIR/scripts/husky" ]; then
   if [ -L ".husky" ] || [ -d ".husky" ]; then
     echo "⚠️  .husky already exists. Skipping symlink creation."
     echo "   To use Kiro hooks, remove .husky and run:"
-    echo "   ln -s .kiro/hooks/common/.husky .husky"
+    echo "   ln -s .kiro/scripts/husky .husky"
   else
-    ln -s ".kiro/hooks/common/.husky" ".husky"
+    ln -s ".kiro/scripts/husky" ".husky"
     echo "✅ Git hooks linked to .husky"
-    echo "   Source: .kiro/hooks/common/.husky"
+    echo "   Source: .kiro/scripts/husky"
     echo "   Link: .husky"
   fi
 else
   echo "ℹ️  No Git hooks found in template"
+fi
+
+# Setup GitHub configuration
+echo ""
+echo "🔗 Setting up GitHub configuration..."
+if [ -d "$TARGET_DIR/scripts/github" ]; then
+  if [ -L ".github" ] || [ -d ".github" ]; then
+    echo "⚠️  .github already exists. Skipping symlink creation."
+    echo "   To use Kiro GitHub config, remove .github and run:"
+    echo "   ln -s .kiro/scripts/github .github"
+  else
+    ln -s ".kiro/scripts/github" ".github"
+    echo "✅ GitHub configuration linked"
+    echo "   Source: .kiro/scripts/github"
+    echo "   Link: .github"
+  fi
+else
+  echo "ℹ️  No GitHub configuration found in template"
 fi
 
 # Optional: MCP server configuration
