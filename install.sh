@@ -58,11 +58,11 @@ echo "1️⃣  Agent Chat Language"
 echo "  What language should the agent use in chat?"
 echo "    1) English"
 echo "    2) 日本語 (Japanese)"
-read -p "  Enter your choice (1 or 2) [default: 2]: " -n 1 -r CHAT_CHOICE < /dev/tty
+read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r CHAT_CHOICE < /dev/tty
 echo ""
 case "$CHAT_CHOICE" in
-  1) CHAT_LANG="English" ;;
-  *) CHAT_LANG="Japanese" ;;
+  2) CHAT_LANG="Japanese" ;;
+  *) CHAT_LANG="English" ;;
 esac
 echo "  ✅ Chat language: $CHAT_LANG"
 echo ""
@@ -201,19 +201,19 @@ echo "☁️  Hosting Platform"
 echo "  Select your hosting platform:"
 echo "    1) AWS (Lambda, API Gateway, DynamoDB, S3, CloudFront)"
 echo "    2) Platform (Vercel, Render, Railway, Forge, etc.)"
-read -p "  Enter your choice (1 or 2) [default: 2]: " -n 1 -r HOSTING_CHOICE < /dev/tty
+read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r HOSTING_CHOICE < /dev/tty
 echo ""
 
 case "$HOSTING_CHOICE" in
-  1)
-    echo "  📝 Setting up AWS structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
-    echo "  ✅ AWS structure template copied"
-    ;;
-  *)
+  2)
     echo "  📝 Setting up default structure..."
     cp "$TARGET_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ Default structure template copied"
+    ;;
+  *)
+    echo "  📝 Setting up AWS structure..."
+    cp "$TARGET_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
+    echo "  ✅ AWS structure template copied"
     ;;
 esac
 echo ""
