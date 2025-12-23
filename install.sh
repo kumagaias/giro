@@ -356,9 +356,9 @@ echo ""
 echo "📝 Setting up Makefile..."
 if [ -f "Makefile" ]; then
   echo "⚠️  Makefile already exists. Skipping."
-  echo "   See Makefile.example for reference"
+  echo "   See .kiro/giro/Makefile.example for reference"
 else
-  cp "$TEMP_DIR/Makefile.example" "Makefile"
+  cp "$TEMP_DIR/.kiro/giro/Makefile.example" "Makefile"
   echo "✅ Makefile created from template"
   echo "   Customize it for your project"
 fi
@@ -369,7 +369,7 @@ echo "🔧 Setting up .tool-versions..."
 if [ -f ".tool-versions" ]; then
   echo "⚠️  .tool-versions already exists. Skipping."
 else
-  cp "$TEMP_DIR/.tool-versions.example" ".tool-versions"
+  cp "$TEMP_DIR/.kiro/giro/.tool-versions.example" ".tool-versions"
   echo "✅ .tool-versions created from template"
   echo "   Edit to specify your tool versions"
 fi
@@ -488,9 +488,9 @@ echo ""
 echo "📝 Setting up Makefile..."
 if [ -f "Makefile" ]; then
   echo "⚠️  Makefile already exists. Skipping."
-  echo "   See Makefile.example for reference"
+  echo "   See .kiro/giro/Makefile.example for reference"
 else
-  cp "$TEMP_DIR/Makefile.example" "Makefile"
+  cp "$TEMP_DIR/.kiro/giro/Makefile.example" "Makefile"
   echo "✅ Makefile created from template"
   echo "   Customize it for your project"
 fi
@@ -501,7 +501,7 @@ echo "🔧 Setting up .tool-versions..."
 if [ -f ".tool-versions" ]; then
   echo "⚠️  .tool-versions already exists. Skipping."
 else
-  cp "$TEMP_DIR/.tool-versions.example" ".tool-versions"
+  cp "$TEMP_DIR/.kiro/giro/.tool-versions.example" ".tool-versions"
   echo "✅ .tool-versions created from template"
   echo "   Edit to specify your tool versions"
 fi

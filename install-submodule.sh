@@ -338,9 +338,9 @@ echo ""
 echo "📝 Setting up Makefile..."
 if [ -f "Makefile" ]; then
   echo "⚠️  Makefile already exists. Skipping."
-  echo "   See $SUBMODULE_DIR/Makefile.example for reference"
+  echo "   See $SUBMODULE_DIR/.kiro/giro/Makefile.example for reference"
 else
-  cp "$SUBMODULE_DIR/Makefile.example" "Makefile"
+  cp "$SUBMODULE_DIR/.kiro/giro/Makefile.example" "Makefile"
   echo "✅ Makefile created from template"
   echo "   Customize it for your project"
 fi
@@ -351,7 +351,7 @@ echo "🔧 Setting up .tool-versions..."
 if [ -f ".tool-versions" ]; then
   echo "⚠️  .tool-versions already exists. Skipping."
 else
-  cp "$SUBMODULE_DIR/.tool-versions.example" ".tool-versions"
+  cp "$SUBMODULE_DIR/.kiro/giro/.tool-versions.example" ".tool-versions"
   echo "✅ .tool-versions created from template"
   echo "   Edit to specify your tool versions"
 fi
