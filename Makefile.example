@@ -1,4 +1,4 @@
-.PHONY: help install test test-unit test-e2e test-security test-lint clean check-tools dev build deploy
+.PHONY: help install test test-unit test-e2e test-security test-lint clean check-tools dev build deploy sync-to-giro
 
 # Default target
 help:
@@ -15,6 +15,7 @@ help:
 	@echo "  make clean             - Clean build artifacts"
 	@echo "  make check-tools       - Check required tools"
 	@echo "  make deploy            - Deploy to production"
+	@echo "  make sync-to-giro      - Sync improvements to giro template"
 
 # Install dependencies
 install: check-tools
@@ -86,3 +87,8 @@ check-tools:
 	@command -v gh >/dev/null 2>&1 || { echo "❌ gh (GitHub CLI) not found"; exit 1; }
 	@command -v gitleaks >/dev/null 2>&1 || { echo "❌ gitleaks not found"; exit 1; }
 	@echo "✅ All required tools are installed"
+
+# Sync improvements to giro template repository
+sync-to-giro:
+	@echo "🔄 Syncing improvements to giro..."
+	@./.kiro/scripts/sync-to-giro.sh

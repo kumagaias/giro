@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# Kiro Configuration Installer
+# Kiro Configuration Installer (Submodule Version)
 # Usage: 
-#   curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install-submodule.sh | bash
 
 set -e
 
 REPO_URL="https://github.com/kumagaias/giro"
 BRANCH="${KIRO_BRANCH:-main}"
-TEMP_DIR=$(mktemp -d)
+SUBMODULE_DIR=".kiro-template"
 TARGET_DIR=".kiro"
 
-echo "🚀 Installing Kiro configuration..."
+echo "🚀 Installing Kiro configuration (submodule version)..."
 echo ""
 
 # Check if git is installed
@@ -20,117 +20,99 @@ if ! command -v git &> /dev/null; then
   exit 1
 fi
 
-# Clone repository
-echo "📦 Downloading configuration from $REPO_URL..."
-if ! git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$TEMP_DIR" 2>/dev/null; then
-  echo "❌ Failed to download. Please check:"
+# Check if we're in a git repository
+if [ ! -d ".git" ]; then
+  echo "❌ Not a git repository. Please run 'git init' first."
+  exit 1
+fi
+
+# Check if submodule already exists
+if [ -d "$SUBMODULE_DIR" ]; then
+  echo ""
+  echo "⚠️  .kiro-template submodule already exists."
+  echo ""
+  echo "Choose update mode:"
+  echo "  1) Update submodule to latest"
+  echo "  2) Reinstall (remove and re-add)"
+  echo "  3) Cancel"
+  read -p "Enter your choice (1-3) [default: 1]: " -n 1 -r UPDATE_MODE < /dev/tty
+  echo ""
+  
+  case "$UPDATE_MODE" in
+    2)
+      echo "📦 Removing old submodule..."
+      git submodule deinit -f "$SUBMODULE_DIR"
+      git rm -f "$SUBMODULE_DIR"
+      rm -rf ".git/modules/$SUBMODULE_DIR"
+      echo "✅ Old submodule removed"
+      ;;
+    3)
+      echo "Installation cancelled."
+      exit 0
+      ;;
+    *)
+      echo "📦 Updating submodule..."
+      git submodule update --remote "$SUBMODULE_DIR"
+      echo "✅ Submodule updated"
+      echo ""
+      echo "💡 Commit the update:"
+      echo "   git add .kiro-template"
+      echo "   git commit -m 'chore: Update giro template'"
+      exit 0
+      ;;
+  esac
+fi
+
+# Add submodule
+echo "📦 Adding giro as submodule..."
+if ! git submodule add -b "$BRANCH" "$REPO_URL" "$SUBMODULE_DIR" 2>/dev/null; then
+  echo "❌ Failed to add submodule. Please check:"
   echo "   - Repository URL: $REPO_URL"
   echo "   - Branch: $BRANCH"
   echo "   - Internet connection"
   exit 1
 fi
 
-# Copy .kiro directory
-if [ -d "$TARGET_DIR" ]; then
-  echo ""
-  echo "⚠️  .kiro directory already exists in current directory."
-  echo ""
-  echo "Choose installation mode:"
-  echo "  1) Update only (preserve your customizations)"
-  echo "  2) Full overwrite (replace everything)"
-  echo "  3) Cancel"
-  read -p "Enter your choice (1-3) [default: 1]: " -n 1 -r INSTALL_MODE < /dev/tty
-  echo ""
-  
-  case "$INSTALL_MODE" in
-    2)
-      echo "📦 Creating backup..."
-      BACKUP_DIR=".kiro.backup.$(date +%Y%m%d_%H%M%S)"
-      cp -r "$TARGET_DIR" "$BACKUP_DIR"
-      echo "✅ Backup created: $BACKUP_DIR"
-      echo ""
-      echo "📁 Removing old .kiro..."
-      rm -rf "$TARGET_DIR"
-      echo "📁 Copying new .kiro directory..."
-      cp -r "$TEMP_DIR/.kiro" "$TARGET_DIR"
-      echo "✅ .kiro directory replaced"
-      echo ""
-      echo "💡 Restore customizations from: $BACKUP_DIR"
-      ;;
-    3)
-      echo "Installation cancelled."
-      rm -rf "$TEMP_DIR"
-      exit 0
-      ;;
-    *)
-      echo "📦 Update mode: preserving customizations..."
-      echo ""
-      
-      # Backup user customizations
-      TEMP_BACKUP=$(mktemp -d)
-      [ -f "$TARGET_DIR/steering/project.md" ] && cp "$TARGET_DIR/steering/project.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/steering/tech.md" ] && cp "$TARGET_DIR/steering/tech.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/steering/structure.md" ] && cp "$TARGET_DIR/steering/structure.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/steering/language.md" ] && cp "$TARGET_DIR/steering/language.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/settings/mcp.local.json" ] && cp "$TARGET_DIR/settings/mcp.local.json" "$TEMP_BACKUP/"
-      
-      # Update common files
-      echo "  📁 Updating common files..."
-      cp -r "$TEMP_DIR/.kiro/hooks" "$TARGET_DIR/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/steering/common" "$TARGET_DIR/steering/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/steering/steering-examples" "$TARGET_DIR/steering/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/steering/README.md" "$TARGET_DIR/steering/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/settings/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/settings/mcp.local.json.example" "$TARGET_DIR/settings/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/settings/README.md" "$TARGET_DIR/settings/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/husky" "$TARGET_DIR/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/github" "$TARGET_DIR/" 2>/dev/null || true
-      
-      # Restore user customizations
-      echo "  📁 Restoring your customizations..."
-      [ -f "$TEMP_BACKUP/project.md" ] && cp "$TEMP_BACKUP/project.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/tech.md" ] && cp "$TEMP_BACKUP/tech.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/structure.md" ] && cp "$TEMP_BACKUP/structure.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/language.md" ] && cp "$TEMP_BACKUP/language.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/mcp.local.json" ] && cp "$TEMP_BACKUP/mcp.local.json" "$TARGET_DIR/settings/"
-      
-      rm -rf "$TEMP_BACKUP"
-      echo "✅ .kiro updated (customizations preserved)"
-      echo ""
-      echo "💡 Updated: hooks, common steering, settings templates"
-      echo "💡 Preserved: project.md, tech.md, structure.md, language.md, mcp.local.json"
-      
-      # Skip language and hosting selection in update mode
-      rm -rf "$TEMP_DIR"
-      
-      echo ""
-      echo "✨ Update complete!"
-      echo ""
-      echo "📋 What was updated:"
-      echo "  ✅ Agent hooks"
-      echo "  ✅ Common steering files"
-      echo "  ✅ Git hooks (.kiro/husky)"
-      echo "  ✅ GitHub configuration (.kiro/github)"
-      echo "  ✅ MCP settings templates"
-      echo ""
-      echo "📋 What was preserved:"
-      echo "  ✅ Your project.md"
-      echo "  ✅ Your tech.md"
-      echo "  ✅ Your structure.md"
-      echo "  ✅ Your language.md"
-      echo "  ✅ Your mcp.local.json"
-      echo ""
-      exit 0
-      ;;
-  esac
-else
-  echo "📁 Copying .kiro directory..."
-  cp -r "$TEMP_DIR/.kiro" "$TARGET_DIR"
-  echo "✅ .kiro directory copied"
-fi
+echo "✅ Submodule added: $SUBMODULE_DIR"
+echo ""
+
+# Initialize submodule
+git submodule update --init --recursive
+
+# Create .kiro directory structure
+echo "📁 Setting up .kiro directory..."
+mkdir -p "$TARGET_DIR/steering"
+mkdir -p "$TARGET_DIR/settings"
+
+# Create symlinks for common files
+echo "🔗 Creating symlinks for common files..."
+
+# Remove existing symlinks/directories if they exist
+[ -L "$TARGET_DIR/hooks" ] && rm "$TARGET_DIR/hooks"
+[ -L "$TARGET_DIR/steering/common" ] && rm "$TARGET_DIR/steering/common"
+[ -L "$TARGET_DIR/steering/steering-examples" ] && rm "$TARGET_DIR/steering/steering-examples"
+[ -L "$TARGET_DIR/steering/README.md" ] && rm "$TARGET_DIR/steering/README.md"
+[ -L "$TARGET_DIR/settings/mcp.json" ] && rm "$TARGET_DIR/settings/mcp.json"
+[ -L "$TARGET_DIR/settings/mcp.local.json.example" ] && rm "$TARGET_DIR/settings/mcp.local.json.example"
+[ -L "$TARGET_DIR/settings/README.md" ] && rm "$TARGET_DIR/settings/README.md"
+[ -L ".husky" ] && rm ".husky"
+[ -L ".github" ] && rm ".github"
+
+# Create symlinks
+ln -s "../$SUBMODULE_DIR/.kiro/hooks" "$TARGET_DIR/hooks"
+ln -s "../../$SUBMODULE_DIR/.kiro/steering/common" "$TARGET_DIR/steering/common"
+ln -s "../../$SUBMODULE_DIR/.kiro/steering/steering-examples" "$TARGET_DIR/steering/steering-examples"
+ln -s "../../$SUBMODULE_DIR/.kiro/steering/README.md" "$TARGET_DIR/steering/README.md"
+ln -s "../../$SUBMODULE_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/settings/mcp.json"
+ln -s "../../$SUBMODULE_DIR/.kiro/settings/mcp.local.json.example" "$TARGET_DIR/settings/mcp.local.json.example"
+ln -s "../../$SUBMODULE_DIR/.kiro/settings/README.md" "$TARGET_DIR/settings/README.md"
+ln -s "$SUBMODULE_DIR/.kiro/husky" ".husky"
+ln -s "$SUBMODULE_DIR/.kiro/github" ".github"
+
+echo "✅ Symlinks created"
+echo ""
 
 # Language selection
-echo ""
 echo "🌐 Language Configuration"
 echo ""
 
@@ -288,12 +270,12 @@ echo ""
 case "$HOSTING_CHOICE" in
   2)
     echo "  📝 Setting up AWS structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
+    cp "$SUBMODULE_DIR/.kiro/steering/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ AWS structure template copied"
     ;;
   *)
     echo "  📝 Setting up default structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
+    cp "$SUBMODULE_DIR/.kiro/steering/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ Default structure template copied"
     ;;
 esac
@@ -355,13 +337,12 @@ fi
 echo ""
 
 # Copy Makefile
-echo ""
 echo "📝 Setting up Makefile..."
 if [ -f "Makefile" ]; then
   echo "⚠️  Makefile already exists. Skipping."
-  echo "   See Makefile.example for reference"
+  echo "   See $SUBMODULE_DIR/Makefile.example for reference"
 else
-  cp "$TEMP_DIR/Makefile.example" "Makefile"
+  cp "$SUBMODULE_DIR/Makefile.example" "Makefile"
   echo "✅ Makefile created from template"
   echo "   Customize it for your project"
 fi
@@ -372,48 +353,9 @@ echo "🔧 Setting up .tool-versions..."
 if [ -f ".tool-versions" ]; then
   echo "⚠️  .tool-versions already exists. Skipping."
 else
-  cp "$TEMP_DIR/.tool-versions.example" ".tool-versions"
+  cp "$SUBMODULE_DIR/.tool-versions.example" ".tool-versions"
   echo "✅ .tool-versions created from template"
   echo "   Edit to specify your tool versions"
-fi
-
-# Cleanup
-rm -rf "$TEMP_DIR"
-
-# Setup Git hooks
-echo ""
-echo "🔗 Setting up Git hooks..."
-if [ -d "$TARGET_DIR/scripts/husky" ]; then
-  if [ -L ".husky" ] || [ -d ".husky" ]; then
-    echo "⚠️  .husky already exists. Skipping symlink creation."
-    echo "   To use Kiro hooks, remove .husky and run:"
-    echo "   ln -s .kiro/scripts/husky .husky"
-  else
-    ln -s ".kiro/scripts/husky" ".husky"
-    echo "✅ Git hooks linked to .husky"
-    echo "   Source: .kiro/scripts/husky"
-    echo "   Link: .husky"
-  fi
-else
-  echo "ℹ️  No Git hooks found in template"
-fi
-
-# Setup GitHub configuration
-echo ""
-echo "🔗 Setting up GitHub configuration..."
-if [ -d "$TARGET_DIR/scripts/github" ]; then
-  if [ -L ".github" ] || [ -d ".github" ]; then
-    echo "⚠️  .github already exists. Skipping symlink creation."
-    echo "   To use Kiro GitHub config, remove .github and run:"
-    echo "   ln -s .kiro/scripts/github .github"
-  else
-    ln -s ".kiro/scripts/github" ".github"
-    echo "✅ GitHub configuration linked"
-    echo "   Source: .kiro/scripts/github"
-    echo "   Link: .github"
-  fi
-else
-  echo "ℹ️  No GitHub configuration found in template"
 fi
 
 # Optional: MCP server configuration
@@ -491,7 +433,7 @@ EOF
       ;;
     4)
       echo "Enabling all optional servers..."
-      cp "$TARGET_DIR/settings/mcp.local.json.example" "$TARGET_DIR/settings/mcp.local.json"
+      cp "$SUBMODULE_DIR/.kiro/settings/mcp.local.json.example" "$TARGET_DIR/settings/mcp.local.json"
       echo "✅ All optional servers enabled"
       ;;
     *)
@@ -502,93 +444,34 @@ else
   echo "ℹ️  Skipping MCP server configuration"
 fi
 
-# Copy Makefile
-echo ""
-echo "📝 Setting up Makefile..."
-if [ -f "Makefile" ]; then
-  echo "⚠️  Makefile already exists. Skipping."
-  echo "   See Makefile.example for reference"
-else
-  cp "$TEMP_DIR/Makefile.example" "Makefile"
-  echo "✅ Makefile created from template"
-  echo "   Customize it for your project"
-fi
-
-# Copy .tool-versions
-echo ""
-echo "🔧 Setting up .tool-versions..."
-if [ -f ".tool-versions" ]; then
-  echo "⚠️  .tool-versions already exists. Skipping."
-else
-  cp "$TEMP_DIR/.tool-versions.example" ".tool-versions"
-  echo "✅ .tool-versions created from template"
-  echo "   Edit to specify your tool versions"
-fi
-
-# Cleanup
-rm -rf "$TEMP_DIR"
-
-# Setup Git hooks
-echo ""
-echo "📁 Setting up Git hooks..."
-if [ -d ".husky" ]; then
-  echo "⚠️  .husky already exists"
-  read -p "Overwrite? Existing files will be backed up. (y/N): " -n 1 -r HUSKY_REPLACE < /dev/tty
-  echo ""
-  if [[ $HUSKY_REPLACE =~ ^[Yy]$ ]]; then
-    BACKUP_HUSKY=".husky.backup.$(date +%Y%m%d_%H%M%S)"
-    mv ".husky" "$BACKUP_HUSKY"
-    echo "  📦 Backed up to: $BACKUP_HUSKY"
-    cp -r "$TARGET_DIR/husky" ".husky"
-    echo "  ✅ Git hooks copied to .husky"
-  else
-    echo "  ℹ️  Keeping existing .husky"
-  fi
-else
-  cp -r "$TARGET_DIR/husky" ".husky"
-  echo "✅ Git hooks copied to .husky"
-fi
-
-# Setup GitHub configuration
-echo ""
-echo "📁 Setting up GitHub configuration..."
-if [ -d ".github" ]; then
-  echo "⚠️  .github already exists"
-  read -p "Overwrite? Existing files will be backed up. (y/N): " -n 1 -r GITHUB_REPLACE < /dev/tty
-  echo ""
-  if [[ $GITHUB_REPLACE =~ ^[Yy]$ ]]; then
-    BACKUP_GITHUB=".github.backup.$(date +%Y%m%d_%H%M%S)"
-    mv ".github" "$BACKUP_GITHUB"
-    echo "  📦 Backed up to: $BACKUP_GITHUB"
-    cp -r "$TARGET_DIR/github" ".github"
-    echo "  ✅ GitHub configuration copied to .github"
-  else
-    echo "  ℹ️  Keeping existing .github"
-  fi
-else
-  cp -r "$TARGET_DIR/github" ".github"
-  echo "✅ GitHub configuration copied to .github"
-fi
-
 echo ""
 echo "✨ Installation complete!"
 echo ""
 echo "📋 Next steps:"
 echo ""
-echo "1. Install required tools:"
+echo "1. Commit the submodule:"
+echo "   git add .gitmodules .kiro-template .kiro .husky .github Makefile .tool-versions"
+echo "   git commit -m 'chore: Add giro configuration as submodule'"
+echo ""
+echo "2. Install required tools:"
 echo "   brew install gitleaks          # Security scanning"
 echo "   brew install gh && gh auth login  # GitHub CLI"
 echo ""
-echo "2. Customize for your project:"
+echo "3. Customize for your project:"
 echo "   - Edit Makefile (add your build/test commands)"
 echo "   - Edit .tool-versions (specify tool versions)"
 echo "   - Edit .kiro/steering/project.md"
 echo "   - Edit .kiro/steering/tech.md"
 echo "   - Edit .kiro/steering/structure.md"
 echo ""
-echo "3. Verify setup:"
+echo "4. Verify setup:"
 echo "   git add ."
 echo "   git commit -m \"test: Verify hooks\" --allow-empty"
+echo ""
+echo "📚 To update giro template later:"
+echo "   git submodule update --remote .kiro-template"
+echo "   git add .kiro-template"
+echo "   git commit -m 'chore: Update giro template'"
 echo ""
 echo "📚 Documentation: $REPO_URL"
 echo ""
