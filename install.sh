@@ -78,13 +78,12 @@ if [ -d "$TARGET_DIR" ]; then
       echo "  📁 Updating common files..."
       cp -r "$TEMP_DIR/.kiro/hooks" "$TARGET_DIR/" 2>/dev/null || true
       cp -r "$TEMP_DIR/.kiro/steering/common" "$TARGET_DIR/steering/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/steering/steering-examples" "$TARGET_DIR/steering/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/steering/README.md" "$TARGET_DIR/steering/" 2>/dev/null || true
+      cp -r "$TEMP_DIR/steering-examples" "$TARGET_DIR/../" 2>/dev/null || true
       cp -r "$TEMP_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/settings/" 2>/dev/null || true
       cp -r "$TEMP_DIR/.kiro/settings/mcp.local.json.example" "$TARGET_DIR/settings/" 2>/dev/null || true
       cp -r "$TEMP_DIR/.kiro/settings/README.md" "$TARGET_DIR/settings/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/husky" "$TARGET_DIR/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/github" "$TARGET_DIR/" 2>/dev/null || true
+      cp -r "$TEMP_DIR/husky" "$TARGET_DIR/../" 2>/dev/null || true
+      cp -r "$TEMP_DIR/github" "$TARGET_DIR/../" 2>/dev/null || true
       
       # Restore user customizations
       echo "  📁 Restoring your customizations..."
@@ -288,12 +287,12 @@ echo ""
 case "$HOSTING_CHOICE" in
   2)
     echo "  📝 Setting up AWS structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
+    cp "$TEMP_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ AWS structure template copied"
     ;;
   *)
     echo "  📝 Setting up default structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
+    cp "$TEMP_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ Default structure template copied"
     ;;
 esac

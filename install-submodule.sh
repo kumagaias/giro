@@ -90,24 +90,18 @@ echo "🔗 Creating symlinks for common files..."
 # Remove existing symlinks/directories if they exist
 [ -L "$TARGET_DIR/hooks" ] && rm "$TARGET_DIR/hooks"
 [ -L "$TARGET_DIR/steering/common" ] && rm "$TARGET_DIR/steering/common"
-[ -L "$TARGET_DIR/steering/steering-examples" ] && rm "$TARGET_DIR/steering/steering-examples"
-[ -L "$TARGET_DIR/steering/README.md" ] && rm "$TARGET_DIR/steering/README.md"
 [ -L "$TARGET_DIR/settings/mcp.json" ] && rm "$TARGET_DIR/settings/mcp.json"
 [ -L "$TARGET_DIR/settings/mcp.local.json.example" ] && rm "$TARGET_DIR/settings/mcp.local.json.example"
-[ -L "$TARGET_DIR/settings/README.md" ] && rm "$TARGET_DIR/settings/README.md"
 [ -L ".husky" ] && rm ".husky"
 [ -L ".github" ] && rm ".github"
 
 # Create symlinks
 ln -s "../$SUBMODULE_DIR/.kiro/hooks" "$TARGET_DIR/hooks"
 ln -s "../../$SUBMODULE_DIR/.kiro/steering/common" "$TARGET_DIR/steering/common"
-ln -s "../../$SUBMODULE_DIR/.kiro/steering/steering-examples" "$TARGET_DIR/steering/steering-examples"
-ln -s "../../$SUBMODULE_DIR/.kiro/steering/README.md" "$TARGET_DIR/steering/README.md"
 ln -s "../../$SUBMODULE_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/settings/mcp.json"
 ln -s "../../$SUBMODULE_DIR/.kiro/settings/mcp.local.json.example" "$TARGET_DIR/settings/mcp.local.json.example"
-ln -s "../../$SUBMODULE_DIR/.kiro/settings/README.md" "$TARGET_DIR/settings/README.md"
-ln -s "$SUBMODULE_DIR/.kiro/husky" ".husky"
-ln -s "$SUBMODULE_DIR/.kiro/github" ".github"
+ln -s "$SUBMODULE_DIR/husky" ".husky"
+ln -s "$SUBMODULE_DIR/github" ".github"
 
 echo "✅ Symlinks created"
 echo ""
@@ -270,12 +264,12 @@ echo ""
 case "$HOSTING_CHOICE" in
   2)
     echo "  📝 Setting up AWS structure..."
-    cp "$SUBMODULE_DIR/.kiro/steering/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
+    cp "$SUBMODULE_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ AWS structure template copied"
     ;;
   *)
     echo "  📝 Setting up default structure..."
-    cp "$SUBMODULE_DIR/.kiro/steering/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
+    cp "$SUBMODULE_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
     echo "  ✅ Default structure template copied"
     ;;
 esac

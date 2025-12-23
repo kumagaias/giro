@@ -9,18 +9,18 @@ Development guidelines and best practices for this project.
 ├── common/                      # Common guidelines (shared, version controlled)
 │   ├── project.md              # Common project standards
 │   └── tech.md                 # Common technical practices
-├── steering-examples/           # Templates (version controlled)
-│   └── common/                 # Common templates
-│       ├── language-en.md      # English language template
-│       ├── language-ja.md      # Japanese language template
-│       ├── structure-aws.md    # AWS hosting template
-│       ├── structure-default.md # Default hosting template
-│       └── structure.md        # Common structure (archived)
 ├── language.md                  # Project language settings (generated, gitignored)
 ├── structure.md                 # Project structure (generated, gitignored)
 ├── project.md                   # Project-specific standards (generated, gitignored)
 ├── tech.md                      # Project-specific tech details (generated, gitignored)
 └── README.md                    # This file
+
+steering-examples/               # Templates (version controlled, at repo root)
+└── common/
+    ├── language-en.md          # English language template
+    ├── language-ja.md          # Japanese language template
+    ├── structure-aws.md        # AWS hosting template
+    └── structure-default.md    # Default hosting template
 ```
 
 ## File Types
@@ -30,7 +30,7 @@ Development guidelines and best practices for this project.
 These files are in Git and shared across all projects:
 
 - `common/` - Common guidelines applicable to all projects
-- `steering-examples/common/` - Templates for project-specific files
+- `steering-examples/` (at repo root) - Templates for project-specific files
 
 ### Project-Specific (Gitignored)
 
@@ -86,5 +86,5 @@ structure.md > common/structure.md
 1. **Keep common/ generic** - Only include universally applicable guidelines
 2. **Customize project files** - Add project-specific details to generated files
 3. **Don't commit generated files** - They're in .gitignore for a reason
-4. **Update templates** - Improve steering-examples/common/ based on learnings
+4. **Update templates** - Improve steering-examples/ based on learnings
 5. **Document decisions** - Use project.md to record important decisions
