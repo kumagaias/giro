@@ -1,87 +1,135 @@
-# Kiro Configuration Template
+# Kiro Best Practices
 
-Shared Kiro configuration for consistent development practices across projects.
+Shared configuration and best practices for Kiro AI development environment.
 
 ## What's Included
 
-- **Hooks** - Agent hooks for testing and security
-- **Steering** - Development guidelines
-- **Settings** - MCP configurations (fetch, github)
-- **Git Hooks** - Pre-commit security checks
-- **GitHub** - Workflows, PR/Issue templates
-- **Makefile** - Common tasks
+- **Agent Hooks** - JSON-based hooks for Kiro agent automation
+- **MCP Settings** - Model Context Protocol configuration templates
+- **Steering Files** - Common development guidelines (project.md, tech.md)
+- **Git Hooks** - Security checks and pre-commit/pre-push scripts
+- **Project Templates** - Husky, GitHub, Makefile, .tool-versions
 
 ## Requirements
 
-```bash
-brew install gitleaks gh
-gh auth login
-```
+- Git
+- Bash shell
+- Node.js (for projects using Git hooks)
 
 ## Installation
 
-### Standalone (For Users)
+Install shared configuration to `~/.kiro/`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 ```
 
-### Submodule (For Contributors)
+This will:
+1. Clone this repository to `~/.kiro/kiro-best-practices/`
+2. Create symlinks from `~/.kiro/` to repository files (hooks, settings, steering, scripts, templates)
+
+**Note**: Files are symlinked, so updates to the repository automatically reflect in `~/.kiro/`
+
+## Usage
+
+### Setup Git Hooks in Your Project
 
 ```bash
-git init  # if needed
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install-submodule.sh | bash
-# Auto-commit option available
+cd /path/to/your/project
+~/.kiro/scripts/setup-git-hooks.sh
 ```
 
-## Updating
+This will:
+- Install husky (if not already installed)
+- Copy hook templates from `~/.kiro/templates/husky/`
+- Configure hooks to call `~/.kiro/scripts/security-check.sh`
 
-### Standalone
+### Use MCP Configuration
+
+Common MCP settings are installed to `~/.kiro/settings/mcp.json` and automatically used by Kiro.
+
+For project-specific MCP settings:
+```bash
+# Create project-specific MCP configuration
+mkdir -p .kiro/settings
+vim .kiro/settings/mcp.json
+```
+
+Kiro will merge both configurations (project settings override common settings).
+
+### Use Project Templates
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
-# Choose "1) Update only"
+# Copy Makefile template
+cp ~/.kiro/templates/Makefile.example ./Makefile
+
+# Copy tool versions
+cp ~/.kiro/templates/.tool-versions.example ./.tool-versions
+
+# Copy GitHub templates
+cp -r ~/.kiro/templates/github/ ./.github/
 ```
 
-### Submodule
+### Steering Files
+
+Kiro will automatically read steering files from:
+- `~/.kiro/steering/` - Common guidelines (shared across all projects)
+- `.kiro/steering/` - Project-specific guidelines
+
+Create project-specific steering files:
+```bash
+mkdir -p .kiro/steering
+# Create .kiro/steering/structure.md
+# Create .kiro/steering/project.md (project-specific overrides)
+```
+
+## Update
+
+Update shared configuration:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/update-submodule.sh | bash
-# Auto-commit option available
+curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/update.sh | bash
 ```
 
-## Verify Setup
+Or manually:
+```bash
+cd ~/.kiro/kiro-best-practices
+git pull
+```
+
+**Note**: Since files are symlinked, `git pull` automatically updates all shared files.
+
+## Uninstall
+
+Remove shared configuration:
 
 ```bash
-git commit -m "test: Verify setup" --allow-empty
-# Should run security checks
+curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/uninstall.sh | bash
 ```
 
-## Contributing
+Note: This will NOT remove project-specific `.kiro/` directories.
 
-```bash
-cd .kiro-template
-git checkout -b feat/improve-something
-# Make changes
-git add .
-git commit -m "feat: Improve something"
-git push origin feat/improve-something
-gh pr create
+## Structure
+
+```
+~/.kiro/
+├── kiro-best-practices/     # This repository (git clone)
+│   └── .kiro/
+│       ├── hooks/
+│       ├── settings/
+│       ├── steering/
+│       ├── scripts/
+│       ├── templates/
+│       └── docs/
+├── hooks/          -> kiro-best-practices/.kiro/hooks/
+├── settings/       -> kiro-best-practices/.kiro/settings/
+├── steering/       -> kiro-best-practices/.kiro/steering/
+├── scripts/        -> kiro-best-practices/.kiro/scripts/
+├── templates/      -> kiro-best-practices/.kiro/templates/
+└── docs/           -> kiro-best-practices/.kiro/docs/
 ```
 
-## Uninstalling
-
-### Standalone
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/uninstall.sh | bash
-```
-
-### Submodule
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/uninstall-submodule.sh | bash
-```
+**Note**: `->` indicates symlinks. All files are linked to the repository.
 
 ## License
 

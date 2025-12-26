@@ -1,64 +1,79 @@
 #!/bin/bash
 
-# Kiro Configuration Uninstaller
+# Kiro Best Practices Uninstaller
+# Removes shared configuration from ~/.kiro/
 # Usage: 
-#   curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/uninstall.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/uninstall.sh | bash
 
 set -e
 
-echo "🗑️  Uninstalling Kiro configuration..."
+KIRO_HOME="$HOME/.kiro"
+REPO_DIR="$KIRO_HOME/kiro-best-practices"
+
+echo "🗑️  Kiro Best Practices Uninstaller"
+echo "===================================="
 echo ""
 
-# Remove .kiro directory
-if [ -d ".kiro" ]; then
-  echo "Removing .kiro directory..."
-  rm -rf ".kiro"
-  echo "✅ .kiro directory removed"
-else
-  echo "ℹ️  .kiro directory not found"
+if [ ! -d "$KIRO_HOME" ]; then
+  echo "ℹ️  ~/.kiro directory not found. Nothing to uninstall."
+  exit 0
 fi
 
-# Remove symlinks
-if [ -L ".husky" ]; then
-  echo "Removing .husky symlink..."
-  rm ".husky"
-  echo "✅ .husky symlink removed"
-elif [ -d ".husky" ]; then
-  echo "⚠️  .husky is a directory (not a symlink). Skipping."
-else
-  echo "ℹ️  .husky not found"
-fi
-
-if [ -L ".github" ]; then
-  echo "Removing .github symlink..."
-  rm ".github"
-  echo "✅ .github symlink removed"
-elif [ -d ".github" ]; then
-  echo "⚠️  .github is a directory (not a symlink). Skipping."
-else
-  echo "ℹ️  .github not found"
-fi
-
-# Optional: Remove Makefile and .tool-versions
+echo "⚠️  This will remove:"
+echo "  - $REPO_DIR"
+echo "  - ~/.kiro/hooks/"
+echo "  - ~/.kiro/settings/"
+echo "  - ~/.kiro/steering/"
+echo "  - ~/.kiro/scripts/"
+echo "  - ~/.kiro/templates/"
+echo "  - ~/.kiro/docs/"
 echo ""
-read -p "Remove Makefile? (y/N): " -n 1 -r REMOVE_MAKEFILE < /dev/tty
+echo "⚠️  Your project-specific .kiro/ directories will NOT be affected."
 echo ""
-if [[ $REMOVE_MAKEFILE =~ ^[Yy]$ ]]; then
-  if [ -f "Makefile" ]; then
-    rm "Makefile"
-    echo "✅ Makefile removed"
-  fi
-fi
 
-read -p "Remove .tool-versions? (y/N): " -n 1 -r REMOVE_TOOL_VERSIONS < /dev/tty
+read -p "Continue? (y/N): " -n 1 -r
 echo ""
-if [[ $REMOVE_TOOL_VERSIONS =~ ^[Yy]$ ]]; then
-  if [ -f ".tool-versions" ]; then
-    rm ".tool-versions"
-    echo "✅ .tool-versions removed"
-  fi
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "Cancelled."
+  exit 0
 fi
 
 echo ""
-echo "✨ Uninstallation complete!"
+echo "🗑️  Removing files..."
+
+# Remove repository
+if [ -d "$REPO_DIR" ]; then
+  rm -rf "$REPO_DIR"
+  echo "  ✓ Removed repository"
+fi
+
+# Remove symlinks (individual files)
+rm -f "$KIRO_HOME/hooks/pre-commit-security.json" 2>/dev/null && echo "  ✓ Removed hooks/pre-commit-security.json" || true
+rm -f "$KIRO_HOME/hooks/run-all-tests.json" 2>/dev/null && echo "  ✓ Removed hooks/run-all-tests.json" || true
+rm -f "$KIRO_HOME/hooks/run-tests.json" 2>/dev/null && echo "  ✓ Removed hooks/run-tests.json" || true
+
+rm -f "$KIRO_HOME/settings/mcp.json" 2>/dev/null && echo "  ✓ Removed settings/mcp.json" || true
+rm -f "$KIRO_HOME/settings/mcp.local.json.example" 2>/dev/null && echo "  ✓ Removed settings/mcp.local.json.example" || true
+
+rm -f "$KIRO_HOME/steering/project.md" 2>/dev/null && echo "  ✓ Removed steering/project.md" || true
+rm -f "$KIRO_HOME/steering/tech.md" 2>/dev/null && echo "  ✓ Removed steering/tech.md" || true
+
+rm -f "$KIRO_HOME/scripts/security-check.sh" 2>/dev/null && echo "  ✓ Removed scripts/security-check.sh" || true
+rm -f "$KIRO_HOME/scripts/setup-git-hooks.sh" 2>/dev/null && echo "  ✓ Removed scripts/setup-git-hooks.sh" || true
+
+rm -f "$KIRO_HOME/templates" 2>/dev/null && echo "  ✓ Removed templates symlink" || true
+rm -f "$KIRO_HOME/docs" 2>/dev/null && echo "  ✓ Removed docs symlink" || true
+
+# Remove empty directories
+rmdir "$KIRO_HOME/hooks" 2>/dev/null && echo "  ✓ Removed hooks directory" || true
+rmdir "$KIRO_HOME/settings" 2>/dev/null && echo "  ✓ Removed settings directory" || true
+rmdir "$KIRO_HOME/steering" 2>/dev/null && echo "  ✓ Removed steering directory" || true
+rmdir "$KIRO_HOME/scripts" 2>/dev/null && echo "  ✓ Removed scripts directory" || true
+
+echo ""
+echo "✅ Uninstallation complete!"
+echo ""
+echo "💡 Note: Your project-specific .kiro/ directories were not removed."
+echo "   You may want to clean up Git hooks in your projects manually."
 echo ""

@@ -1,4 +1,4 @@
-.PHONY: help install test test-unit test-e2e test-security test-lint clean check-tools dev build deploy sync-to-giro
+.PHONY: help install test test-unit test-e2e test-security test-lint clean check-tools dev build deploy sync-to-kiro-bp
 
 # Default target
 help:
@@ -88,7 +88,7 @@ check-tools:
 	@command -v gitleaks >/dev/null 2>&1 || { echo "❌ gitleaks not found"; exit 1; }
 	@echo "✅ All required tools are installed"
 
-# Sync improvements to giro template repository
-sync-to-giro:
-	@echo "🔄 Syncing improvements to giro..."
+# Sync improvements to kiro-best-practices template repository
+sync-to-kiro-bp:
+	@echo "🔄 Syncing improvements to kiro-best-practices..."
 	@./.kiro/giro/sync-to-giro.sh

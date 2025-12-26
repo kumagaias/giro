@@ -1,575 +1,225 @@
 #!/bin/bash
 
-# Kiro Configuration Installer
+# Kiro Best Practices Installer
+# Installs shared configuration to ~/.kiro/
 # Usage: 
-#   curl -fsSL https://raw.githubusercontent.com/kumagaias/giro/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 
 set -e
 
-REPO_URL="https://github.com/kumagaias/giro"
+REPO_URL="https://github.com/kumagaias/kiro-best-practices"
 BRANCH="${KIRO_BRANCH:-main}"
-TEMP_DIR=$(mktemp -d)
-TARGET_DIR=".kiro"
+KIRO_HOME="$HOME/.kiro"
+REPO_DIR="$KIRO_HOME/kiro-best-practices"
 
-echo "🚀 Installing Kiro configuration..."
+echo "🚀 Kiro Best Practices Installer"
+echo "================================"
 echo ""
 
-# Check if git is installed
-if ! command -v git &> /dev/null; then
-  echo "❌ Git is not installed. Please install git first."
-  exit 1
+# Check if ~/.kiro exists
+if [ ! -d "$KIRO_HOME" ]; then
+  echo "📁 Creating ~/.kiro directory..."
+  mkdir -p "$KIRO_HOME"
 fi
 
-# Clone repository
-echo "📦 Downloading configuration from $REPO_URL..."
-if ! git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$TEMP_DIR" 2>/dev/null; then
-  echo "❌ Failed to download. Please check:"
-  echo "   - Repository URL: $REPO_URL"
-  echo "   - Branch: $BRANCH"
-  echo "   - Internet connection"
-  exit 1
+# Clone or update repository
+if [ -d "$REPO_DIR" ]; then
+  echo "📦 Repository already exists. Updating..."
+  cd "$REPO_DIR"
+  
+  # Check if it's a git repository
+  if [ ! -d ".git" ]; then
+    echo "❌ $REPO_DIR exists but is not a git repository"
+    echo "   Please remove it manually: rm -rf $REPO_DIR"
+    exit 1
+  fi
+  
+  # Update repository
+  git fetch origin
+  git reset --hard "origin/$BRANCH"
+  echo "✅ Repository updated to latest version"
+else
+  echo "📦 Cloning repository..."
+  git clone -b "$BRANCH" "$REPO_URL" "$REPO_DIR"
+  echo "✅ Repository cloned"
 fi
 
-# Copy .kiro directory
-if [ -d "$TARGET_DIR" ]; then
+echo ""
+echo "📋 Installing shared files to ~/.kiro/..."
+
+# Check for existing files
+CONFLICTS=()
+for file in hooks/pre-commit-security.json hooks/run-all-tests.json hooks/run-tests.json \
+            settings/mcp.json settings/mcp.local.json.example \
+            steering/project.md steering/tech.md \
+            scripts/security-check.sh scripts/setup-git-hooks.sh; do
+  [ -e "$KIRO_HOME/$file" ] && CONFLICTS+=("$file")
+done
+
+# Handle conflicts
+SKIP_FILES=()
+if [ ${#CONFLICTS[@]} -gt 0 ]; then
   echo ""
-  echo "⚠️  .kiro directory already exists in current directory."
+  echo "⚠️  Existing files found in ~/.kiro/:"
+  for item in "${CONFLICTS[@]}"; do
+    if [ -L "$KIRO_HOME/$item" ]; then
+      echo "  - $item (symlink)"
+    else
+      echo "  - $item"
+    fi
+  done
   echo ""
-  echo "Choose installation mode:"
-  echo "  1) Update only (preserve your customizations)"
-  echo "  2) Full overwrite (replace everything)"
-  echo "  3) Cancel"
-  read -p "Enter your choice (1-3) [default: 1]: " -n 1 -r INSTALL_MODE < /dev/tty
+  echo "Options:"
+  echo "  1) Overwrite all (replace with symlinks)"
+  echo "  2) Skip all (keep existing files)"
+  echo "  3) Ask for each file"
+  echo ""
+  read -p "Choose [1-3]: " -n 1 -r
   echo ""
   
-  case "$INSTALL_MODE" in
-    2)
-      echo "📦 Creating backup..."
-      BACKUP_DIR=".kiro.backup.$(date +%Y%m%d_%H%M%S)"
-      cp -r "$TARGET_DIR" "$BACKUP_DIR"
-      echo "✅ Backup created: $BACKUP_DIR"
-      echo ""
-      echo "📁 Removing old .kiro..."
-      rm -rf "$TARGET_DIR"
-      echo "📁 Copying new .kiro directory..."
-      cp -r "$TEMP_DIR/.kiro" "$TARGET_DIR"
-      echo "✅ .kiro directory replaced"
-      echo ""
-      echo "💡 Restore customizations from: $BACKUP_DIR"
-      ;;
-    3)
-      echo "Installation cancelled."
-      rm -rf "$TEMP_DIR"
-      exit 0
-      ;;
-    *)
-      echo "📦 Update mode: preserving customizations..."
-      echo ""
-      
-      # Backup user customizations
-      TEMP_BACKUP=$(mktemp -d)
-      [ -f "$TARGET_DIR/steering/project.md" ] && cp "$TARGET_DIR/steering/project.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/steering/tech.md" ] && cp "$TARGET_DIR/steering/tech.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/steering/structure.md" ] && cp "$TARGET_DIR/steering/structure.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/steering/language.md" ] && cp "$TARGET_DIR/steering/language.md" "$TEMP_BACKUP/"
-      [ -f "$TARGET_DIR/settings/mcp.local.json" ] && cp "$TARGET_DIR/settings/mcp.local.json" "$TEMP_BACKUP/"
-      
-      # Update common files
-      echo "  📁 Updating common files..."
-      cp -r "$TEMP_DIR/.kiro/hooks" "$TARGET_DIR/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/steering/common" "$TARGET_DIR/steering/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/giro/steering-examples" "$TARGET_DIR/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/settings/mcp.json" "$TARGET_DIR/settings/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/settings/mcp.local.json.example" "$TARGET_DIR/settings/" 2>/dev/null || true
-      cp -r "$TEMP_DIR/.kiro/giro" "$TARGET_DIR/" 2>/dev/null || true
-      
-      # Restore user customizations
-      echo "  📁 Restoring your customizations..."
-      [ -f "$TEMP_BACKUP/project.md" ] && cp "$TEMP_BACKUP/project.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/tech.md" ] && cp "$TEMP_BACKUP/tech.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/structure.md" ] && cp "$TEMP_BACKUP/structure.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/language.md" ] && cp "$TEMP_BACKUP/language.md" "$TARGET_DIR/steering/"
-      [ -f "$TEMP_BACKUP/mcp.local.json" ] && cp "$TEMP_BACKUP/mcp.local.json" "$TARGET_DIR/settings/"
-      
-      rm -rf "$TEMP_BACKUP"
-      echo "✅ .kiro updated (customizations preserved)"
-      echo ""
-      echo "💡 Updated: hooks, common steering, settings templates"
-      echo "💡 Preserved: project.md, tech.md, structure.md, language.md, mcp.local.json"
-      
-      # Skip language and hosting selection in update mode
-      rm -rf "$TEMP_DIR"
-      
-      echo ""
-      echo "✨ Update complete!"
-      echo ""
-      echo "📋 What was updated:"
-      echo "  ✅ Agent hooks"
-      echo "  ✅ Common steering files"
-      echo "  ✅ Git hooks (.kiro/husky)"
-      echo "  ✅ GitHub configuration (.kiro/github)"
-      echo "  ✅ MCP settings templates"
-      echo ""
-      echo "📋 What was preserved:"
-      echo "  ✅ Your project.md"
-      echo "  ✅ Your tech.md"
-      echo "  ✅ Your structure.md"
-      echo "  ✅ Your language.md"
-      echo "  ✅ Your mcp.local.json"
-      echo ""
-      exit 0
-      ;;
-  esac
-else
-  echo "📁 Copying .kiro directory..."
-  cp -r "$TEMP_DIR/.kiro" "$TARGET_DIR"
-  echo "✅ .kiro directory copied"
-fi
-
-# Language selection
-echo ""
-echo "🌐 Language Configuration"
-echo ""
-
-# Chat language
-echo "1️⃣  Agent Chat Language"
-echo "  What language should the agent use in chat?"
-echo "    1) English"
-echo "    2) 日本語 (Japanese)"
-read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r CHAT_CHOICE < /dev/tty
-echo ""
-case "$CHAT_CHOICE" in
-  2) CHAT_LANG="Japanese" ;;
-  *) CHAT_LANG="English" ;;
-esac
-echo "  ✅ Chat language: $CHAT_LANG"
-echo ""
-
-# Documentation language
-echo "2️⃣  Documentation Language"
-echo "  What language should be used for internal docs (steering, specs)?"
-echo "    1) English"
-echo "    2) 日本語 (Japanese)"
-read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r DOC_CHOICE < /dev/tty
-echo ""
-case "$DOC_CHOICE" in
-  2) DOC_LANG="Japanese" ;;
-  *) DOC_LANG="English" ;;
-esac
-echo "  ✅ Documentation language: $DOC_LANG"
-echo ""
-
-# Code comment language
-echo "3️⃣  Code Comment Language"
-echo "  What language should be used for code comments?"
-echo "    1) English"
-echo "    2) 日本語 (Japanese)"
-read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r COMMENT_CHOICE < /dev/tty
-echo ""
-case "$COMMENT_CHOICE" in
-  2) COMMENT_LANG="Japanese" ;;
-  *) COMMENT_LANG="English" ;;
-esac
-echo "  ✅ Code comment language: $COMMENT_LANG"
-echo ""
-
-# Generate language.md
-echo "📝 Generating language configuration..."
-
-cat > "$TARGET_DIR/steering/language.md" << EOF
----
-inclusion: always
----
-
-# Language Settings
-
-## Communication Standards
-
-- **Agent chat**: $CHAT_LANG
-- **Documentation**: $DOC_LANG
-- **Code comments**: $COMMENT_LANG
-- **README files**: English (max 200 lines)
-- **GitHub PRs/Issues**: English
-- **Commit messages**: English
-
-## Instructions for Agent
-
-### Chat Language: $CHAT_LANG
-
-EOF
-
-if [ "$CHAT_LANG" = "Japanese" ]; then
-  cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-- すべてのチャットでの会話は日本語で行ってください
-- エラーメッセージの説明も日本語で提供してください
-- ユーザーとのコミュニケーションは日本語で行ってください
-
-EOF
-else
-  cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-- All chat conversations should be conducted in English
-- Provide error message explanations in English
-- Communicate with users in English
-
-EOF
-fi
-
-cat >> "$TARGET_DIR/steering/language.md" << EOF
-### Documentation Language: $DOC_LANG
-
-EOF
-
-if [ "$DOC_LANG" = "Japanese" ]; then
-  cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-- プロジェクト内部のドキュメント（steering, specs など）は日本語で記述してください
-- ただし、README.md は英語で記述してください（国際標準）
-- 技術仕様書やデザインドキュメントは日本語で記述してください
-
-EOF
-else
-  cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-- All project documentation should be written in English
-- This includes steering files, specs, and README files
-- Technical specifications and design documents should be in English
-
-EOF
-fi
-
-cat >> "$TARGET_DIR/steering/language.md" << EOF
-### Code Comment Language: $COMMENT_LANG
-
-EOF
-
-if [ "$COMMENT_LANG" = "Japanese" ]; then
-  cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-- コード内のコメントは日本語で記述してください
-- 関数やクラスの説明コメントも日本語で記述してください
-- インラインコメントも日本語で記述してください
-
-EOF
-else
-  cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-- All code comments should be written in English
-- This includes function, class, and inline comments
-- JSDoc, TSDoc, and similar documentation comments should be in English
-
-EOF
-fi
-
-cat >> "$TARGET_DIR/steering/language.md" << 'EOF'
-## Fixed Rules (Unchangeable)
-
-Always use English for:
-- GitHub PR/Issue titles and descriptions
-- Commit messages
-- README.md (project root)
-- Public API documentation
-
-## File Naming Conventions
-
-- All file names should use English
-- Examples: `project.md`, `tech.md`, `structure.md`
-EOF
-
-echo "✅ Language configuration complete"
-
-# Hosting platform selection
-echo ""
-echo "☁️  Hosting Platform"
-echo "  Select your hosting platform:"
-echo "    1) None (Generic structure)"
-echo "    2) AWS (Lambda, API Gateway, DynamoDB, S3, CloudFront)"
-read -p "  Enter your choice (1 or 2) [default: 1]: " -n 1 -r HOSTING_CHOICE < /dev/tty
-echo ""
-
-case "$HOSTING_CHOICE" in
-  2)
-    echo "  📝 Setting up AWS structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-aws.md" "$TARGET_DIR/steering/structure.md"
-    echo "  ✅ AWS structure template copied"
-    ;;
-  *)
-    echo "  📝 Setting up default structure..."
-    cp "$TARGET_DIR/steering-examples/common/structure-default.md" "$TARGET_DIR/steering/structure.md"
-    echo "  ✅ Default structure template copied"
-    ;;
-esac
-echo ""
-
-# Create placeholder project-specific files
-echo "📝 Creating project-specific steering files..."
-
-if [ ! -f "$TARGET_DIR/steering/project.md" ]; then
-  cat > "$TARGET_DIR/steering/project.md" << 'EOF'
-# Project Standards
-
-Project-specific standards and conventions.
-
-See `.kiro/steering/common/project.md` for common standards.
-
----
-
-## Project-Specific Rules
-
-Add your project-specific rules here.
-
-## Team Conventions
-
-Add your team conventions here.
-
-## Workflow
-
-Add your workflow here.
-EOF
-  echo "  ✅ project.md created"
-fi
-
-if [ ! -f "$TARGET_DIR/steering/tech.md" ]; then
-  cat > "$TARGET_DIR/steering/tech.md" << 'EOF'
-# Technical Details
-
-Project-specific technical details and architecture.
-
-See `.kiro/steering/common/tech.md` for common practices.
-
----
-
-## Architecture
-
-Describe your project architecture here.
-
-## Technology Stack
-
-List your technology stack here.
-
-## Development Setup
-
-Add development setup instructions here.
-EOF
-  echo "  ✅ tech.md created"
-fi
-
-echo ""
-
-# Copy Makefile
-echo ""
-echo "📝 Setting up Makefile..."
-if [ -f "Makefile" ]; then
-  echo "⚠️  Makefile already exists. Skipping."
-  echo "   See .kiro/giro/Makefile.example for reference"
-else
-  cp "$TEMP_DIR/.kiro/giro/Makefile.example" "Makefile"
-  echo "✅ Makefile created from template"
-  echo "   Customize it for your project"
-fi
-
-# Copy .tool-versions
-echo ""
-echo "🔧 Setting up .tool-versions..."
-if [ -f ".tool-versions" ]; then
-  echo "⚠️  .tool-versions already exists. Skipping."
-else
-  cp "$TEMP_DIR/.kiro/giro/.tool-versions.example" ".tool-versions"
-  echo "✅ .tool-versions created from template"
-  echo "   Edit to specify your tool versions"
-fi
-
-# Cleanup
-rm -rf "$TEMP_DIR"
-
-# Setup Git hooks
-echo ""
-echo "📁 Setting up Git hooks..."
-if [ -d ".husky" ]; then
-  echo "⚠️  .husky already exists. Skipping."
-else
-  cp -r "$TARGET_DIR/scripts/husky" ".husky"
-  echo "✅ Git hooks copied to .husky"
-fi
-
-# Setup GitHub configuration
-echo ""
-echo "📁 Setting up GitHub configuration..."
-if [ -d ".github" ]; then
-  echo "⚠️  .github already exists. Skipping."
-else
-  cp -r "$TARGET_DIR/scripts/github" ".github"
-  echo "✅ GitHub configuration copied to .github"
-fi
-
-# Optional: MCP server configuration
-echo ""
-echo "🔧 MCP Server Configuration"
-read -p "Do you want to enable optional MCP servers? (y/N): " -n 1 -r MCP_CHOICE < /dev/tty
-echo ""
-
-if [[ $MCP_CHOICE =~ ^[Yy]$ ]]; then
-  echo ""
-  echo "Available optional MCP servers:"
-  echo "  1) aws-docs - AWS documentation search"
-  echo "  2) terraform - Terraform operations"
-  echo "  3) playwright - Browser automation"
-  echo "  4) All of the above"
-  echo "  5) None (skip)"
-  echo ""
-  read -p "Enter your choice (1-5) [default: 5]: " -n 1 -r SERVER_CHOICE < /dev/tty
-  echo ""
-  
-  case "$SERVER_CHOICE" in
+  case $REPLY in
     1)
-      echo "Enabling aws-docs..."
-      cat > "$TARGET_DIR/settings/mcp.local.json" << 'EOF'
-{
-  "mcpServers": {
-    "aws-docs": {
-      "command": "uvx",
-      "args": ["awslabs.aws-documentation-mcp-server@latest"],
-      "env": {
-        "FASTMCP_LOG_LEVEL": "ERROR"
-      },
-      "disabled": false,
-      "autoApprove": []
-    }
-  }
-}
-EOF
-      echo "✅ aws-docs enabled"
+      echo "🔄 Overwriting all existing files..."
+      for item in "${CONFLICTS[@]}"; do
+        rm -f "$KIRO_HOME/$item" 2>/dev/null || true
+      done
       ;;
     2)
-      echo "Enabling terraform..."
-      cat > "$TARGET_DIR/settings/mcp.local.json" << 'EOF'
-{
-  "mcpServers": {
-    "terraform": {
-      "command": "uvx",
-      "args": ["awslabs.terraform-mcp-server@latest"],
-      "env": {
-        "FASTMCP_LOG_LEVEL": "ERROR"
-      },
-      "disabled": false,
-      "autoApprove": []
-    }
-  }
-}
-EOF
-      echo "✅ terraform enabled"
+      echo "⏭️  Skipping all existing files..."
+      SKIP_FILES=("${CONFLICTS[@]}")
       ;;
     3)
-      echo "Enabling playwright..."
-      cat > "$TARGET_DIR/settings/mcp.local.json" << 'EOF'
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"],
-      "disabled": false,
-      "autoApprove": []
-    }
-  }
-}
-EOF
-      echo "✅ playwright enabled"
-      ;;
-    4)
-      echo "Enabling all optional servers..."
-      cp "$TARGET_DIR/settings/mcp.local.json.example" "$TARGET_DIR/settings/mcp.local.json"
-      echo "✅ All optional servers enabled"
+      echo ""
+      for item in "${CONFLICTS[@]}"; do
+        echo "File: $item"
+        read -p "  Overwrite? (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+          SKIP_FILES+=("$item")
+          echo "  ⏭️  Skipped"
+        else
+          rm -f "$KIRO_HOME/$item" 2>/dev/null || true
+          echo "  ✓ Will overwrite"
+        fi
+        echo ""
+      done
       ;;
     *)
-      echo "ℹ️  Skipping optional MCP servers"
+      echo "Invalid choice. Installation cancelled."
+      exit 1
       ;;
   esac
-else
-  echo "ℹ️  Skipping MCP server configuration"
-fi
-
-# Copy Makefile
-echo ""
-echo "📝 Setting up Makefile..."
-if [ -f "Makefile" ]; then
-  echo "⚠️  Makefile already exists. Skipping."
-  echo "   See .kiro/giro/Makefile.example for reference"
-else
-  cp "$TEMP_DIR/.kiro/giro/Makefile.example" "Makefile"
-  echo "✅ Makefile created from template"
-  echo "   Customize it for your project"
-fi
-
-# Copy .tool-versions
-echo ""
-echo "🔧 Setting up .tool-versions..."
-if [ -f ".tool-versions" ]; then
-  echo "⚠️  .tool-versions already exists. Skipping."
-else
-  cp "$TEMP_DIR/.kiro/giro/.tool-versions.example" ".tool-versions"
-  echo "✅ .tool-versions created from template"
-  echo "   Edit to specify your tool versions"
-fi
-
-# Cleanup
-rm -rf "$TEMP_DIR"
-
-# Setup Git hooks
-echo ""
-echo "📁 Setting up Git hooks..."
-if [ -d ".husky" ]; then
-  echo "⚠️  .husky already exists"
-  read -p "Overwrite? Existing files will be backed up. (y/N): " -n 1 -r HUSKY_REPLACE < /dev/tty
   echo ""
-  if [[ $HUSKY_REPLACE =~ ^[Yy]$ ]]; then
-    BACKUP_HUSKY=".husky.backup.$(date +%Y%m%d_%H%M%S)"
-    mv ".husky" "$BACKUP_HUSKY"
-    echo "  📦 Backed up to: $BACKUP_HUSKY"
-    cp -r "$TARGET_DIR/husky" ".husky"
-    echo "  ✅ Git hooks copied to .husky"
-  else
-    echo "  ℹ️  Keeping existing .husky"
+fi
+
+# Create directory structure
+echo "  📁 Creating directory structure..."
+mkdir -p "$KIRO_HOME/hooks"
+mkdir -p "$KIRO_HOME/settings"
+mkdir -p "$KIRO_HOME/steering"
+mkdir -p "$KIRO_HOME/scripts"
+
+# Helper function to check if file should be skipped
+should_skip() {
+  local file="$1"
+  for skip in "${SKIP_FILES[@]}"; do
+    [ "$skip" = "$file" ] && return 0
+  done
+  return 1
+}
+
+# Create symlinks for individual files
+echo "  🔗 Creating symlinks..."
+
+# Hooks
+should_skip "hooks/pre-commit-security.json" || ln -sf "$REPO_DIR/.kiro/hooks/pre-commit-security.json" "$KIRO_HOME/hooks/pre-commit-security.json"
+should_skip "hooks/run-all-tests.json" || ln -sf "$REPO_DIR/.kiro/hooks/run-all-tests.json" "$KIRO_HOME/hooks/run-all-tests.json"
+should_skip "hooks/run-tests.json" || ln -sf "$REPO_DIR/.kiro/hooks/run-tests.json" "$KIRO_HOME/hooks/run-tests.json"
+
+# Settings
+should_skip "settings/mcp.json" || ln -sf "$REPO_DIR/.kiro/settings/mcp.json" "$KIRO_HOME/settings/mcp.json"
+should_skip "settings/mcp.local.json.example" || ln -sf "$REPO_DIR/.kiro/settings/mcp.local.json.example" "$KIRO_HOME/settings/mcp.local.json.example"
+
+# Steering
+should_skip "steering/project.md" || ln -sf "$REPO_DIR/.kiro/steering/project.md" "$KIRO_HOME/steering/project.md"
+should_skip "steering/tech.md" || ln -sf "$REPO_DIR/.kiro/steering/tech.md" "$KIRO_HOME/steering/tech.md"
+
+# Scripts
+should_skip "scripts/security-check.sh" || ln -sf "$REPO_DIR/.kiro/scripts/security-check.sh" "$KIRO_HOME/scripts/security-check.sh"
+should_skip "scripts/setup-git-hooks.sh" || ln -sf "$REPO_DIR/.kiro/scripts/setup-git-hooks.sh" "$KIRO_HOME/scripts/setup-git-hooks.sh"
+
+# Templates and docs (directory symlinks)
+if [ -e "$KIRO_HOME/templates" ]; then
+  echo "  ⚠️  templates directory already exists"
+  read -p "  Overwrite? (y/N): " -n 1 -r
+  echo ""
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    rm -rf "$KIRO_HOME/templates" 2>/dev/null || true
+    ln -sf "$REPO_DIR/.kiro/templates" "$KIRO_HOME/templates"
   fi
 else
-  cp -r "$TARGET_DIR/husky" ".husky"
-  echo "✅ Git hooks copied to .husky"
+  ln -sf "$REPO_DIR/.kiro/templates" "$KIRO_HOME/templates"
 fi
 
-# Setup GitHub configuration
-echo ""
-echo "📁 Setting up GitHub configuration..."
-if [ -d ".github" ]; then
-  echo "⚠️  .github already exists"
-  read -p "Overwrite? Existing files will be backed up. (y/N): " -n 1 -r GITHUB_REPLACE < /dev/tty
+if [ -e "$KIRO_HOME/docs" ]; then
+  echo "  ⚠️  docs directory already exists"
+  read -p "  Overwrite? (y/N): " -n 1 -r
   echo ""
-  if [[ $GITHUB_REPLACE =~ ^[Yy]$ ]]; then
-    BACKUP_GITHUB=".github.backup.$(date +%Y%m%d_%H%M%S)"
-    mv ".github" "$BACKUP_GITHUB"
-    echo "  📦 Backed up to: $BACKUP_GITHUB"
-    cp -r "$TARGET_DIR/github" ".github"
-    echo "  ✅ GitHub configuration copied to .github"
-  else
-    echo "  ℹ️  Keeping existing .github"
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    rm -rf "$KIRO_HOME/docs" 2>/dev/null || true
+    ln -sf "$REPO_DIR/.kiro/docs" "$KIRO_HOME/docs"
   fi
 else
-  cp -r "$TARGET_DIR/github" ".github"
-  echo "✅ GitHub configuration copied to .github"
+  ln -sf "$REPO_DIR/.kiro/docs" "$KIRO_HOME/docs"
+fi
+
+# Set execute permissions on scripts
+chmod +x "$KIRO_HOME/scripts"/*.sh 2>/dev/null || true
+
+# Show skipped files
+if [ ${#SKIP_FILES[@]} -gt 0 ]; then
+  echo ""
+  echo "⏭️  Skipped files (existing files kept):"
+  for item in "${SKIP_FILES[@]}"; do
+    echo "  - $item"
+  done
 fi
 
 echo ""
-echo "✨ Installation complete!"
+echo "✅ Installation complete!"
 echo ""
-echo "📋 Next steps:"
+echo "📋 Installed to ~/.kiro/:"
+echo "  ✓ hooks/          - Agent hooks (JSON)"
+echo "  ✓ settings/       - MCP configuration templates"
+echo "  ✓ steering/       - Common development guidelines"
+echo "  ✓ scripts/        - Git hooks and utility scripts"
+echo "  ✓ templates/      - Project templates (husky, github, etc.)"
+echo "  ✓ docs/           - Documentation"
 echo ""
-echo "1. Install required tools:"
-echo "   brew install gitleaks          # Security scanning"
-echo "   brew install gh && gh auth login  # GitHub CLI"
+echo "📖 Next Steps:"
 echo ""
-echo "2. Customize for your project:"
-echo "   - Edit Makefile (add your build/test commands)"
-echo "   - Edit .tool-versions (specify tool versions)"
-echo "   - Edit .kiro/steering/project.md"
-echo "   - Edit .kiro/steering/tech.md"
-echo "   - Edit .kiro/steering/structure.md"
+echo "1. Setup Git hooks in your project:"
+echo "   cd /path/to/your/project"
+echo "   ~/.kiro/scripts/setup-git-hooks.sh"
 echo ""
-echo "3. Verify setup:"
-echo "   git add ."
-echo "   git commit -m \"test: Verify hooks\" --allow-empty"
+echo "2. Copy project templates (optional):"
+echo "   cp ~/.kiro/templates/Makefile.example ./Makefile"
+echo "   cp ~/.kiro/templates/.tool-versions.example ./.tool-versions"
 echo ""
-echo "📚 Documentation: $REPO_URL"
+echo "3. MCP configuration:"
+echo "   Common MCP settings are in ~/.kiro/settings/mcp.json"
+echo "   For project-specific settings, create .kiro/settings/mcp.json"
+echo ""
+echo "4. Add project-specific steering files:"
+echo "   mkdir -p .kiro/steering"
+echo "   # Create .kiro/steering/structure.md"
+echo "   # Create .kiro/steering/project.md (project-specific)"
+echo ""
+echo "💡 Tip: Kiro reads from both ~/.kiro/ and .kiro/"
+echo "   - ~/.kiro/settings/mcp.json (common)"
+echo "   - .kiro/settings/mcp.json (project-specific, optional)"
+echo "   - ~/.kiro/steering/ (common guidelines)"
+echo "   - .kiro/steering/ (project-specific guidelines)"
+echo ""
+echo "📚 Documentation: ~/.kiro/docs/STEERING.md"
 echo ""
