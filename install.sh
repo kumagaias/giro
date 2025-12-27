@@ -50,7 +50,8 @@ echo "📋 Installing shared files to ~/.kiro/..."
 # Check for existing files
 CONFLICTS=()
 for file in hooks/pre-commit-security.json hooks/run-all-tests.json hooks/run-tests.json \
-            settings/mcp.json settings/mcp.local.json.example \
+            hooks/commit-push-pr.json hooks/documentation-update-reminder.json hooks/setup-on-session-start.json \
+            settings/mcp.json \
             steering/project.md steering/tech.md \
             scripts/security-check.sh scripts/setup-git-hooks.sh; do
   [ -e "$KIRO_HOME/$file" ] && CONFLICTS+=("$file")
@@ -135,6 +136,9 @@ echo "  🔗 Creating symlinks..."
 should_skip "hooks/pre-commit-security.json" || ln -sf "$REPO_DIR/.kiro/hooks/pre-commit-security.json" "$KIRO_HOME/hooks/pre-commit-security.json"
 should_skip "hooks/run-all-tests.json" || ln -sf "$REPO_DIR/.kiro/hooks/run-all-tests.json" "$KIRO_HOME/hooks/run-all-tests.json"
 should_skip "hooks/run-tests.json" || ln -sf "$REPO_DIR/.kiro/hooks/run-tests.json" "$KIRO_HOME/hooks/run-tests.json"
+should_skip "hooks/commit-push-pr.json" || ln -sf "$REPO_DIR/.kiro/hooks/commit-push-pr.json" "$KIRO_HOME/hooks/commit-push-pr.json"
+should_skip "hooks/documentation-update-reminder.json" || ln -sf "$REPO_DIR/.kiro/hooks/documentation-update-reminder.json" "$KIRO_HOME/hooks/documentation-update-reminder.json"
+should_skip "hooks/setup-on-session-start.json" || ln -sf "$REPO_DIR/.kiro/hooks/setup-on-session-start.json" "$KIRO_HOME/hooks/setup-on-session-start.json"
 
 # Settings
 should_skip "settings/mcp.json" || ln -sf "$REPO_DIR/.kiro/settings/mcp.json" "$KIRO_HOME/settings/mcp.json"
