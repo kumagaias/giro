@@ -88,13 +88,7 @@ mkdir -p .kiro/steering
 Update shared configuration:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/update.sh | bash
-```
-
-Or manually:
-```bash
-cd ~/.kiro/kiro-best-practices
-git pull
+cd ~/.kiro/kiro-best-practices && git pull
 ```
 
 **Note**: Since files are symlinked, `git pull` automatically updates all shared files.
