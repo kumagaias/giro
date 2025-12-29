@@ -92,46 +92,46 @@ if [ ${#CONFLICTS[@]} -gt 0 ]; then
     fi
   else
     # Interactive mode: ask user
-  echo "Options:"
-  echo "  1) Overwrite all (replace with symlinks)"
-  echo "  2) Skip all (keep existing files)"
-  echo "  3) Ask for each file"
-  echo ""
-  read -p "Choose [1-3]: " -n 1 -r
-  echo ""
-  
-  case $REPLY in
-    1)
-      echo "🔄 Overwriting all existing files..."
-      for item in "${CONFLICTS[@]}"; do
-        rm -f "$KIRO_HOME/$item" 2>/dev/null || true
-      done
-      ;;
-    2)
-      echo "⏭️  Skipping all existing files..."
-      SKIP_FILES=("${CONFLICTS[@]}")
-      ;;
-    3)
-      echo ""
-      for item in "${CONFLICTS[@]}"; do
-        echo "File: $item"
-        read -p "  Overwrite? (y/N): " -n 1 -r
-        echo ""
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-          SKIP_FILES+=("$item")
-          echo "  ⏭️  Skipped"
-        else
+    echo "Options:"
+    echo "  1) Overwrite all (replace with symlinks)"
+    echo "  2) Skip all (keep existing files)"
+    echo "  3) Ask for each file"
+    echo ""
+    read -p "Choose [1-3]: " -n 1 -r
+    echo ""
+    
+    case $REPLY in
+      1)
+        echo "🔄 Overwriting all existing files..."
+        for item in "${CONFLICTS[@]}"; do
           rm -f "$KIRO_HOME/$item" 2>/dev/null || true
-          echo "  ✓ Will overwrite"
-        fi
+        done
+        ;;
+      2)
+        echo "⏭️  Skipping all existing files..."
+        SKIP_FILES=("${CONFLICTS[@]}")
+        ;;
+      3)
         echo ""
-      done
-      ;;
-    *)
-      echo "Invalid choice. Installation cancelled."
-      exit 1
-      ;;
-  esac
+        for item in "${CONFLICTS[@]}"; do
+          echo "File: $item"
+          read -p "  Overwrite? (y/N): " -n 1 -r
+          echo ""
+          if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            SKIP_FILES+=("$item")
+            echo "  ⏭️  Skipped"
+          else
+            rm -f "$KIRO_HOME/$item" 2>/dev/null || true
+            echo "  ✓ Will overwrite"
+          fi
+          echo ""
+        done
+        ;;
+      *)
+        echo "❌ Invalid choice. Installation cancelled."
+        exit 1
+        ;;
+    esac
   fi
 fi
   echo ""
