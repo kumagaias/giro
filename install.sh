@@ -79,6 +79,19 @@ if [ ${#CONFLICTS[@]} -gt 0 ]; then
     fi
   done
   echo ""
+  # Non-interactive mode: use environment variables or default to overwrite
+  if [ "$INTERACTIVE" = false ]; then
+    if [ "$SKIP" = "1" ]; then
+      echo "⏭️  Skipping all existing files (SKIP=1)..."
+      SKIP_FILES=("${CONFLICTS[@]}")
+    else
+      echo "🔄 Overwriting all existing files (default in non-interactive mode)..."
+      for item in "${CONFLICTS[@]}"; do
+        rm -f "$KIRO_HOME/$item" 2>/dev/null || true
+      done
+    fi
+  else
+    # Interactive mode: ask user
   echo "Options:"
   echo "  1) Overwrite all (replace with symlinks)"
   echo "  2) Skip all (keep existing files)"
@@ -119,6 +132,8 @@ if [ ${#CONFLICTS[@]} -gt 0 ]; then
       exit 1
       ;;
   esac
+  fi
+fi
   echo ""
 fi
 
