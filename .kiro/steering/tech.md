@@ -64,7 +64,7 @@ make clean             # Clean build artifacts
 - Never hardcode sensitive information
 - Use environment variables
 - Sanitize all inputs
-- See `#security-policies` for details
+- See #[[file:security-policies.md]] for details
 
 ### Performance
 - Optimize critical paths
@@ -82,7 +82,7 @@ make clean             # Clean build artifacts
 
 ## Deployment
 
-**For detailed procedures, see**: `#deployment-workflow`
+**For detailed procedures, see**: #[[file:deployment-workflow.md]]
 
 ```bash
 # Always test before push
@@ -92,11 +92,11 @@ git push origin feat/issue-123-feature
 
 ---
 
-**For language-specific practices, refer to:**
-- `.kiro/steering/tech-typescript.md` - TypeScript/React/Node.js (use `#tech-typescript`)
-- `.kiro/steering/tech-python.md` - Python (use `#tech-python`)
-- `.kiro/steering/tech-go.md` - Go (use `#tech-go`)
+**For language-specific practices:**
+- #[[file:tech-typescript.md]] - TypeScript/React/Node.js
+- #[[file:tech-python.md]] - Python (coming soon)
+- #[[file:tech-go.md]] - Go (coming soon)
 
-**For specialized topics, use:**
-- `#security-policies` - Security guidelines
-- `#deployment-workflow` - Deployment procedures
+**For specialized topics:**
+- #[[file:security-policies.md]] - Security guidelines
+- #[[file:deployment-workflow.md]] - Deployment procedures

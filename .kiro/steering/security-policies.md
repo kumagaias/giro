@@ -304,5 +304,5 @@ See `project.md` for postmortem structure.
 ---
 
 **Related guides:**
-- `#project` - Project standards including postmortem guidelines
-- `#tech-typescript` - TypeScript-specific security practices
+- #[[file:project.md]] - Project standards including postmortem guidelines
+- #[[file:tech-typescript.md]] - TypeScript-specific security practices

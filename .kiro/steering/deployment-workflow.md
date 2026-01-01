@@ -466,5 +466,5 @@ curl -X POST https://hooks.slack.com/services/YOUR/WEBHOOK/URL \
 ---
 
 **Related guides:**
-- `#project` - Project standards including deployment checklist
-- `#security-policies` - Security requirements for deployment
+- #[[file:project.md]] - Project standards including deployment checklist
+- #[[file:security-policies.md]] - Security requirements for deployment

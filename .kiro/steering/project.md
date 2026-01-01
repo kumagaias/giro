@@ -189,7 +189,7 @@ make test-security     # Security checks
 
 **Coverage Target**: 60% or higher
 
-**For security details, see**: `#security-policies`
+**For security details, see**: #[[file:security-policies.md]]
 
 ## Documentation Requirements
 
@@ -231,7 +231,7 @@ All specs files should include issue/task number as prefix to prevent conflicts:
 
 ## Deployment Standards
 
-**For detailed deployment procedures, see**: `#deployment-workflow`
+**For detailed deployment procedures, see**: #[[file:deployment-workflow.md]]
 
 ### Pre-deployment Checklist
 - [ ] All tests pass
@@ -348,7 +348,7 @@ cat Makefile.example
 - `tech.md` - Technical details
 - `project.md` - Project standards
 
-**For specialized topics, use:**
-- `#security-policies` - Security guidelines
-- `#deployment-workflow` - Deployment procedures
-- `#tech-typescript` - TypeScript-specific practices
+**For specialized topics:**
+- #[[file:security-policies.md]] - Security guidelines
+- #[[file:deployment-workflow.md]] - Deployment procedures
+- #[[file:tech-typescript.md]] - TypeScript-specific practices
