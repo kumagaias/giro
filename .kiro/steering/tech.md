@@ -72,9 +72,9 @@ git push origin feat/issue-123-feature
 ---
 
 **For language-specific practices:**
-- #[[file:tech-typescript.md]] - TypeScript/React/Node.js
-- #[[file:tech-python.md]] - Python (coming soon)
-- #[[file:tech-go.md]] - Go (coming soon)
+- #[[file:languages/typescript.md]] - TypeScript/React/Node.js
+- #[[file:languages/python.md]] - Python (coming soon)
+- #[[file:languages/go.md]] - Go (coming soon)
 
 **For specialized topics:**
 - #[[file:security-policies.md]] - Security guidelines
