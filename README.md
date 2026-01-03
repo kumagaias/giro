@@ -20,15 +20,22 @@ Shared configuration and best practices for Kiro AI development environment.
 Install shared configuration to `~/.kiro/`:
 
 ```bash
+# Default (Japanese/English)
 curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
+
+# English only
+KIRO_LANG=English curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
+
+# Japanese only
+KIRO_LANG=Japanese curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 ```
 
 This will:
 1. Clone this repository to `~/.kiro/kiro-best-practices/`
-2. Create symlinks from `~/.kiro/` to repository files (hooks, settings, steering, scripts)
-3. Prompt for language selection (English/Japanese/Both) for agent chat
+2. Create symlinks from `~/.kiro/` to repository files
+3. Configure agent chat language preference
 
-**Note**: Files are symlinked, so updates to the repository automatically reflect in `~/.kiro/`
+**Note**: Files are symlinked, so updates automatically reflect in `~/.kiro/`
 
 ## Usage
 
@@ -73,13 +80,11 @@ mkdir -p .kiro/steering
 
 ## Update
 
-Update shared configuration:
-
 ```bash
 cd ~/.kiro/kiro-best-practices && git pull
 ```
 
-**Note**: Since files are symlinked, `git pull` automatically updates all shared files.
+To change language: Re-run install with `KIRO_LANG=English` (or `Japanese`)
 
 ## Uninstall
 
