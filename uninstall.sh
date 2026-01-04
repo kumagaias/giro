@@ -54,13 +54,7 @@ fi
 echo ""
 echo "🗑️  Removing files..."
 
-# Remove repository
-if [ -d "$REPO_DIR" ]; then
-  rm -rf "$REPO_DIR"
-  echo "  ✓ Removed repository"
-fi
-
-# Remove symlinks (individual files)
+# Remove symlinks first (before removing repository)
 rm -f "$KIRO_HOME/hooks/pre-commit-security.json" 2>/dev/null && echo "  ✓ Removed hooks/pre-commit-security.json" || true
 rm -f "$KIRO_HOME/hooks/run-all-tests.json" 2>/dev/null && echo "  ✓ Removed hooks/run-all-tests.json" || true
 rm -f "$KIRO_HOME/hooks/run-tests.json" 2>/dev/null && echo "  ✓ Removed hooks/run-tests.json" || true
@@ -77,6 +71,12 @@ rm -f "$KIRO_HOME/steering/deployment-workflow.md" 2>/dev/null && echo "  ✓ Re
 rm -f "$KIRO_HOME/steering/language.md" 2>/dev/null && echo "  ✓ Removed steering/language.md" || true
 
 rm -f "$KIRO_HOME/scripts/security-check.sh" 2>/dev/null && echo "  ✓ Removed scripts/security-check.sh" || true
+
+# Remove repository
+if [ -d "$REPO_DIR" ]; then
+  rm -rf "$REPO_DIR"
+  echo "  ✓ Removed repository"
+fi
 
 # Remove empty directories
 rmdir "$KIRO_HOME/hooks" 2>/dev/null && echo "  ✓ Removed hooks directory" || true
