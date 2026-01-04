@@ -10,6 +10,13 @@ set -e
 KIRO_HOME="$HOME/.kiro"
 REPO_DIR="$KIRO_HOME/kiro-best-practices"
 
+# Check if running in non-interactive mode (piped from curl)
+if [ -t 0 ]; then
+  INTERACTIVE=true
+else
+  INTERACTIVE=false
+fi
+
 echo "🗑️  Kiro Best Practices Uninstaller"
 echo "===================================="
 echo ""
@@ -31,12 +38,17 @@ echo ""
 echo "⚠️  Your project-specific .kiro/ directories will NOT be affected."
 echo ""
 
-read -p "Continue? (y/N): " -n 1 -r
-echo ""
-
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo "Cancelled."
-  exit 0
+if [ "$INTERACTIVE" = true ]; then
+  read -p "Continue? (y/N): " -n 1 -r
+  echo ""
+  
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Cancelled."
+    exit 0
+  fi
+else
+  echo "⚠️  Running in non-interactive mode. Proceeding with uninstallation..."
+  echo ""
 fi
 
 echo ""
