@@ -31,7 +31,7 @@ if [ "$INTERACTIVE" = true ]; then
   echo "  1) English"
   echo "  2) Japanese (日本語)"
   echo ""
-  read -p "Choose [1-2] (default: 2): " -n 1 -r
+  read -p "Choose [1-2] (default: 1): " -n 1 -r
   echo ""
   
   case $REPLY in
@@ -42,13 +42,13 @@ if [ "$INTERACTIVE" = true ]; then
       AGENT_LANG="Japanese"
       ;;
     *)
-      echo "❌ Invalid choice. Using default (Japanese)."
-      AGENT_LANG="Japanese"
+      echo "❌ Invalid choice. Using default (English)."
+      AGENT_LANG="English"
       ;;
   esac
 else
   # Non-interactive mode: use environment variable or default
-  AGENT_LANG="${KIRO_LANG:-Japanese}"
+  AGENT_LANG="${KIRO_LANG:-English}"
 fi
 
 echo "✓ Agent chat language: $AGENT_LANG"
