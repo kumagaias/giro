@@ -35,23 +35,27 @@ if [ "$INTERACTIVE" = true ]; then
   echo ""
   
   case $REPLY in
-    1)
-      AGENT_LANG="English"
+    1|"")
+      CHAT_LANG="English"
       ;;
-    2|"")
-      AGENT_LANG="Japanese"
+    2)
+      CHAT_LANG="Japanese"
       ;;
     *)
       echo "❌ Invalid choice. Using default (English)."
-      AGENT_LANG="English"
+      CHAT_LANG="English"
       ;;
   esac
 else
   # Non-interactive mode: use environment variable or default
-  AGENT_LANG="${KIRO_LANG:-English}"
+  CHAT_LANG="${KIRO_CHAT_LANG:-English}"
 fi
 
-echo "✓ Agent chat language: $AGENT_LANG"
+# Document language (currently only English available)
+DOC_LANG="${KIRO_DOCUMENT_LANG:-English}"
+
+echo "✓ Agent chat language: $CHAT_LANG"
+echo "✓ Documentation language: $DOC_LANG"
 echo ""
 
 # Check if ~/.kiro exists
@@ -200,17 +204,18 @@ should_skip "steering/project.md" || ln -sf "$REPO_DIR/.kiro/steering/project.md
 should_skip "steering/tech.md" || ln -sf "$REPO_DIR/.kiro/steering/tech.md" "$KIRO_HOME/steering/tech.md"
 should_skip "steering/deployment-workflow.md" || ln -sf "$REPO_DIR/.kiro/steering/deployment-workflow.md" "$KIRO_HOME/steering/deployment-workflow.md"
 
-# Language configuration - create symlink based on selected language
+# Language configuration - copy and customize language.md
 if ! should_skip "steering/language.md"; then
-  echo "  🌐 Setting language to: $AGENT_LANG..."
-  case "$AGENT_LANG" in
-    "English")
-      ln -sf "$REPO_DIR/.kiro/steering/language-english.md" "$KIRO_HOME/steering/language.md"
-      ;;
-    *)
-      ln -sf "$REPO_DIR/.kiro/steering/language-japanese.md" "$KIRO_HOME/steering/language.md"
-      ;;
-  esac
+  echo "  🌐 Creating language.md with chat: $CHAT_LANG, docs: $DOC_LANG..."
+  
+  # Use English template as base
+  cp "$REPO_DIR/.kiro/steering/language-english.md" "$KIRO_HOME/steering/language.md"
+  
+  # Update chat language
+  perl -i -pe "s/\*\*Agent chat language\*\*: English/\*\*Agent chat language\*\*: $ENV{CHAT_LANG}/" "$KIRO_HOME/steering/language.md"
+  
+  # Update documentation language
+  perl -i -pe "s/\*\*Documentation language\*\*: English/\*\*Documentation language\*\*: $ENV{DOC_LANG}/" "$KIRO_HOME/steering/language.md"
 fi
 
 # Scripts
@@ -237,10 +242,11 @@ echo "  ✓ settings/       - MCP configuration templates"
 echo "  ✓ steering/       - Common development guidelines"
 echo "  ✓ scripts/        - Git hooks and utility scripts"
 echo ""
-echo "🌐 Agent chat language: $AGENT_LANG"
+echo "🌐 Agent chat language: $CHAT_LANG
+📚 Documentation language: $DOC_LANG"
 echo ""
 echo "💡 Kiro will automatically use these shared files"
 echo ""
 echo "📚 Update: cd ~/.kiro/kiro-best-practices && git pull"
-echo "🔄 Change language: KIRO_LANG=English ./install.sh"
+echo "🔄 Change language: KIRO_CHAT_LANG=Japanese ./install.sh"
 echo ""

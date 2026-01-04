@@ -1,10 +1,11 @@
 ---
-inclusion: manual
+inclusion: always
 ---
 
 # Language Configuration
 
 **Agent chat language**: English
+**Documentation language**: English
 
-This file configures the preferred language for agent communication.
+This file configures language preferences for agent communication and documentation.
 

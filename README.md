@@ -23,11 +23,13 @@ Install shared configuration to `~/.kiro/`:
 curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 ```
 
-To use Japanese instead of English (default):
+To use Japanese for agent chat:
 
 ```bash
-KIRO_LANG=Japanese curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
+KIRO_CHAT_LANG=Japanese curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 ```
+
+**Note**: Documentation language is currently English only. Japanese documentation support coming soon.
 
 This will:
 1. Clone this repository to `~/.kiro/kiro-best-practices/`
