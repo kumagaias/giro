@@ -204,18 +204,16 @@ should_skip "steering/project.md" || ln -sf "$REPO_DIR/.kiro/steering/project.md
 should_skip "steering/tech.md" || ln -sf "$REPO_DIR/.kiro/steering/tech.md" "$KIRO_HOME/steering/tech.md"
 should_skip "steering/deployment-workflow.md" || ln -sf "$REPO_DIR/.kiro/steering/deployment-workflow.md" "$KIRO_HOME/steering/deployment-workflow.md"
 
-# Language configuration - copy and customize language.md
+# Language configuration - copy template and customize
 if ! should_skip "steering/language.md"; then
   echo "  🌐 Creating language.md with chat: $CHAT_LANG, docs: $DOC_LANG..."
   
-  # Use English template as base
-  cp "$REPO_DIR/.kiro/steering/language-english.md" "$KIRO_HOME/steering/language.md"
+  # Copy template
+  cp "$REPO_DIR/.kiro/steering/kiro-language.md.example" "$KIRO_HOME/steering/language.md"
   
-  # Update chat language
-  perl -i -pe "s/\*\*Agent chat language\*\*: English/\*\*Agent chat language\*\*: $ENV{CHAT_LANG}/" "$KIRO_HOME/steering/language.md"
-  
-  # Update documentation language
-  perl -i -pe "s/\*\*Documentation language\*\*: English/\*\*Documentation language\*\*: $ENV{DOC_LANG}/" "$KIRO_HOME/steering/language.md"
+  # Replace placeholders
+  perl -i -pe "s/CHAT_LANGUAGE_PLACEHOLDER/$ENV{CHAT_LANG}/" "$KIRO_HOME/steering/language.md"
+  perl -i -pe "s/DOCUMENT_LANGUAGE_PLACEHOLDER/$ENV{DOC_LANG}/" "$KIRO_HOME/steering/language.md"
 fi
 
 # Scripts
