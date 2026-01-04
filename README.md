@@ -20,14 +20,11 @@ Shared configuration and best practices for Kiro AI development environment.
 Install shared configuration to `~/.kiro/`:
 
 ```bash
-# Default (Japanese/English)
+# Default (Japanese)
 curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 
-# English only
+# English
 KIRO_LANG=English curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
-
-# Japanese only
-KIRO_LANG=Japanese curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash
 ```
 
 This will:

@@ -30,29 +30,25 @@ if [ "$INTERACTIVE" = true ]; then
   echo "🌐 Select your preferred language for Agent chat:"
   echo "  1) English"
   echo "  2) Japanese (日本語)"
-  echo "  3) Both (English/Japanese)"
   echo ""
-  read -p "Choose [1-3] (default: 3): " -n 1 -r
+  read -p "Choose [1-2] (default: 2): " -n 1 -r
   echo ""
   
   case $REPLY in
     1)
       AGENT_LANG="English"
       ;;
-    2)
+    2|"")
       AGENT_LANG="Japanese"
       ;;
-    3|"")
-      AGENT_LANG="Japanese/English"
-      ;;
     *)
-      echo "❌ Invalid choice. Using default (Both)."
-      AGENT_LANG="Japanese/English"
+      echo "❌ Invalid choice. Using default (Japanese)."
+      AGENT_LANG="Japanese"
       ;;
   esac
 else
   # Non-interactive mode: use environment variable or default
-  AGENT_LANG="${KIRO_LANG:-Japanese/English}"
+  AGENT_LANG="${KIRO_LANG:-Japanese}"
 fi
 
 echo "✓ Agent chat language: $AGENT_LANG"
@@ -211,11 +207,8 @@ if ! should_skip "steering/language.md"; then
     "English")
       ln -sf "$REPO_DIR/.kiro/steering/language-english.md" "$KIRO_HOME/steering/language.md"
       ;;
-    "Japanese")
-      ln -sf "$REPO_DIR/.kiro/steering/language-japanese.md" "$KIRO_HOME/steering/language.md"
-      ;;
     *)
-      ln -sf "$REPO_DIR/.kiro/steering/language-both.md" "$KIRO_HOME/steering/language.md"
+      ln -sf "$REPO_DIR/.kiro/steering/language-japanese.md" "$KIRO_HOME/steering/language.md"
       ;;
   esac
 fi
@@ -249,5 +242,5 @@ echo ""
 echo "💡 Kiro will automatically use these shared files"
 echo ""
 echo "📚 Update: cd ~/.kiro/kiro-best-practices && git pull"
-echo "🔄 Change language: KIRO_LANG=English ./install.sh (or Japanese, Japanese/English)"
+echo "🔄 Change language: KIRO_LANG=English ./install.sh"
 echo ""
