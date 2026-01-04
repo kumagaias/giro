@@ -10,11 +10,12 @@ General project standards applicable to various projects.
 
 ## Communication Standards
 
-- **Agent chat**: Project language (Japanese/English)
 - **README files**: English (max 200 lines)
 - **GitHub PRs/Issues**: English
 - **Commit messages**: English
 - **Code comments**: English
+
+**Note**: Agent chat language is configured in `language.md` (set during installation)
 
 ## Development Flow
 

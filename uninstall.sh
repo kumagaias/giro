@@ -58,6 +58,8 @@ rm -f "$KIRO_HOME/settings/mcp.local.json.example" 2>/dev/null && echo "  ✓ Re
 
 rm -f "$KIRO_HOME/steering/project.md" 2>/dev/null && echo "  ✓ Removed steering/project.md" || true
 rm -f "$KIRO_HOME/steering/tech.md" 2>/dev/null && echo "  ✓ Removed steering/tech.md" || true
+rm -f "$KIRO_HOME/steering/deployment-workflow.md" 2>/dev/null && echo "  ✓ Removed steering/deployment-workflow.md" || true
+rm -f "$KIRO_HOME/steering/language.md" 2>/dev/null && echo "  ✓ Removed steering/language.md" || true
 
 rm -f "$KIRO_HOME/scripts/security-check.sh" 2>/dev/null && echo "  ✓ Removed scripts/security-check.sh" || true
 

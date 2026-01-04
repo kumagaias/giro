@@ -94,7 +94,7 @@ CONFLICTS=()
 for file in hooks/pre-commit-security.json hooks/run-all-tests.json hooks/run-tests.json \
             hooks/commit-push-pr.json hooks/documentation-update-reminder.json hooks/setup-on-session-start.json \
             settings/mcp.json \
-            steering/project.md steering/tech.md \
+            steering/project.md steering/tech.md steering/deployment-workflow.md steering/language.md \
             scripts/security-check.sh; do
   [ -e "$KIRO_HOME/$file" ] && CONFLICTS+=("$file")
 done
@@ -202,14 +202,22 @@ should_skip "settings/mcp.local.json.example" || ln -sf "$REPO_DIR/.kiro/setting
 # Steering
 should_skip "steering/project.md" || ln -sf "$REPO_DIR/.kiro/steering/project.md" "$KIRO_HOME/steering/project.md"
 should_skip "steering/tech.md" || ln -sf "$REPO_DIR/.kiro/steering/tech.md" "$KIRO_HOME/steering/tech.md"
+should_skip "steering/deployment-workflow.md" || ln -sf "$REPO_DIR/.kiro/steering/deployment-workflow.md" "$KIRO_HOME/steering/deployment-workflow.md"
 
-# Create deployment-workflow.md with selected language
-if ! should_skip "steering/deployment-workflow.md"; then
-  echo "  📝 Creating deployment-workflow.md with language: $AGENT_LANG..."
-  cp "$REPO_DIR/.kiro/steering/deployment-workflow.md" "$KIRO_HOME/steering/deployment-workflow.md"
-  
-  # Update the Agent chat language setting using perl (more reliable than sed)
-  perl -i -pe "s/- \*\*Agent chat\*\*: Project language \(Japanese\/English\)/- **Agent chat**: $ENV{AGENT_LANG}/" "$KIRO_HOME/steering/deployment-workflow.md"
+# Language configuration - create symlink based on selected language
+if ! should_skip "steering/language.md"; then
+  echo "  🌐 Setting language to: $AGENT_LANG..."
+  case "$AGENT_LANG" in
+    "English")
+      ln -sf "$REPO_DIR/.kiro/steering/language-english.md" "$KIRO_HOME/steering/language.md"
+      ;;
+    "Japanese")
+      ln -sf "$REPO_DIR/.kiro/steering/language-japanese.md" "$KIRO_HOME/steering/language.md"
+      ;;
+    *)
+      ln -sf "$REPO_DIR/.kiro/steering/language-both.md" "$KIRO_HOME/steering/language.md"
+      ;;
+  esac
 fi
 
 # Scripts
