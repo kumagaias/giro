@@ -211,9 +211,16 @@ if ! should_skip "steering/language.md"; then
   # Copy template
   cp "$REPO_DIR/.kiro/steering/kiro-language.md.example" "$KIRO_HOME/steering/language.md"
   
-  # Replace placeholders
-  perl -i -pe "s/CHAT_LANGUAGE_PLACEHOLDER/$ENV{CHAT_LANG}/" "$KIRO_HOME/steering/language.md"
-  perl -i -pe "s/DOCUMENT_LANGUAGE_PLACEHOLDER/$ENV{DOC_LANG}/" "$KIRO_HOME/steering/language.md"
+  # Replace placeholders using sed (more reliable than perl for simple substitution)
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' "s/CHAT_LANGUAGE_PLACEHOLDER/$CHAT_LANG/g" "$KIRO_HOME/steering/language.md"
+    sed -i '' "s/DOCUMENT_LANGUAGE_PLACEHOLDER/$DOC_LANG/g" "$KIRO_HOME/steering/language.md"
+  else
+    # Linux
+    sed -i "s/CHAT_LANGUAGE_PLACEHOLDER/$CHAT_LANG/g" "$KIRO_HOME/steering/language.md"
+    sed -i "s/DOCUMENT_LANGUAGE_PLACEHOLDER/$DOC_LANG/g" "$KIRO_HOME/steering/language.md"
+  fi
 fi
 
 # Scripts
