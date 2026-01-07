@@ -18,13 +18,22 @@ curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/
 
 **Language Configuration:**
 - `KIRO_CHAT_LANG`: Agent chat language (default: English)
-- `KIRO_DOCUMENT_LANG`: Documentation language (default: English)
+- `KIRO_PROJECT_LANG`: Project-specific language for documentation, Issues, and PRs (default: English)
 
 To use Japanese for agent chat:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | KIRO_CHAT_LANG=Japanese bash
 ```
+
+Or use positional arguments:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash -s Japanese
+curl -fsSL https://raw.githubusercontent.com/kumagaias/kiro-best-practices/main/install.sh | bash -s Japanese Japanese
+```
+
+**Note**: Global configuration (~/.kiro/) is always in English. Project language setting affects project-specific files only.
 
 ## Update
 

@@ -5,7 +5,16 @@ inclusion: always
 # Language Configuration
 
 **Agent chat language**: CHAT_LANGUAGE_PLACEHOLDER
-**Documentation language**: DOCUMENT_LANGUAGE_PLACEHOLDER
+**Project language**: PROJECT_LANGUAGE_PLACEHOLDER
 
-This file configures language preferences for agent communication and documentation.
+## Language Settings
+
+- **Agent chat language**: Language for communication with Kiro AI agent
+- **Project language**: Language for project-specific documentation, GitHub Issues, and Pull Requests
+
+## Notes
+
+- Global configuration (~/.kiro/) is always in English
+- Project-specific files (.kiro/ in each project) can use the configured project language
+- This includes: project documentation, Issue descriptions, PR descriptions, commit messages
 

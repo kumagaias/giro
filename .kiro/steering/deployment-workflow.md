@@ -10,23 +10,26 @@ General project standards applicable to various projects.
 
 ## Communication Standards
 
-- **README files**: English (max 200 lines)
-- **GitHub PRs/Issues**: English
-- **Commit messages**: English
-- **Code comments**: English
+- **Global configuration (~/.kiro/)**: Always English
+- **Project-specific files**: Use configured project language (see `language.md`)
+  - README files (max 200 lines)
+  - GitHub PRs/Issues
+  - Commit messages
+  - Code comments
+  - Project documentation
 
-**Note**: Agent chat language is configured in `language.md` (set during installation)
+**Note**: Agent chat language and project language are configured in `language.md` (set during installation)
 
 ## Default Workflow for All Changes
 
 **IMPORTANT**: Unless explicitly told otherwise, ALWAYS follow this workflow:
 
-1. Create GitHub issue first (with clear title and description in English)
+1. Create GitHub issue first (with clear title and description in configured project language)
 2. Create branch from issue (format: `feat/issue-{number}-{description}`, `fix/issue-{number}-{description}`, etc.)
 3. Make changes and run tests (`make test`)
-4. Commit with issue reference (format: `feat: Description (Refs #{number})`)
+4. Commit with issue reference (format: `feat: Description (Refs #{number})` in project language)
 5. Push to remote
-6. Create PR with English description and link to issue (`Closes #{number}`)
+6. Create PR with description in project language and link to issue (`Closes #{number}`)
 7. Request code review from GitHub Copilot (via MCP if available)
 
 **Do NOT ask for confirmation** - execute this flow automatically when user requests changes.

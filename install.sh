@@ -59,13 +59,13 @@ fi
 
 # Document language (currently only English available)
 if [ -n "$2" ]; then
-  DOC_LANG="$2"
+  PROJECT_LANG="$2"
 else
-  DOC_LANG="${KIRO_DOCUMENT_LANG:-English}"
+  PROJECT_LANG="${KIRO_PROJECT_LANG:-English}"
 fi
 
 echo "✓ Agent chat language: $CHAT_LANG"
-echo "✓ Documentation language: $DOC_LANG"
+echo "✓ Project language: $PROJECT_LANG"
 echo ""
 
 # Check if ~/.kiro exists
@@ -216,7 +216,7 @@ should_skip "steering/deployment-workflow.md" || ln -sf "$REPO_DIR/.kiro/steerin
 
 # Language configuration - copy template and customize
 if ! should_skip "steering/language.md"; then
-  echo "  🌐 Creating language.md with chat: $CHAT_LANG, docs: $DOC_LANG..."
+  echo "  🌐 Creating language.md with chat: $CHAT_LANG, project: $PROJECT_LANG..."
   
   # Copy template
   cp "$REPO_DIR/.kiro/steering/kiro-language.md.example" "$KIRO_HOME/steering/language.md"
@@ -225,11 +225,11 @@ if ! should_skip "steering/language.md"; then
   if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     sed -i '' "s/CHAT_LANGUAGE_PLACEHOLDER/$CHAT_LANG/g" "$KIRO_HOME/steering/language.md"
-    sed -i '' "s/DOCUMENT_LANGUAGE_PLACEHOLDER/$DOC_LANG/g" "$KIRO_HOME/steering/language.md"
+    sed -i '' "s/PROJECT_LANGUAGE_PLACEHOLDER/$PROJECT_LANG/g" "$KIRO_HOME/steering/language.md"
   else
     # Linux
     sed -i "s/CHAT_LANGUAGE_PLACEHOLDER/$CHAT_LANG/g" "$KIRO_HOME/steering/language.md"
-    sed -i "s/DOCUMENT_LANGUAGE_PLACEHOLDER/$DOC_LANG/g" "$KIRO_HOME/steering/language.md"
+    sed -i "s/PROJECT_LANGUAGE_PLACEHOLDER/$PROJECT_LANG/g" "$KIRO_HOME/steering/language.md"
   fi
 fi
 
@@ -258,7 +258,7 @@ echo "  ✓ steering/       - Common development guidelines"
 echo "  ✓ scripts/        - Git hooks and utility scripts"
 echo ""
 echo "🌐 Agent chat language: $CHAT_LANG
-📚 Documentation language: $DOC_LANG"
+📚 Project language: $PROJECT_LANG"
 echo ""
 echo "💡 Kiro will automatically use these shared files"
 echo ""
