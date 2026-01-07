@@ -1,11 +1,11 @@
 {
-  "name": "Commit, Push, and Create PR",
-  "description": "Commit changes, push, and automatically create PR (auto-generate title and description, auto-request Copilot review)",
+  "name": "Full Workflow: Issue → Branch → PR → Review",
+  "description": "Complete automated workflow: Create issue, branch, commit, push, PR, and request Copilot review",
   "trigger": {
     "type": "manual"
   },
   "action": {
     "type": "message",
-    "message": "I will commit changes, push, and create a PR.\n\nSteps:\n1. Check changes\n2. Identify task number or Issue number\n3. Auto-generate commit message\n4. git add, commit, push\n5. Auto-generate PR title and description (in English)\n6. Create PR via GitHub MCP\n7. Auto-request code review from GitHub Copilot\n\nPlease provide task number or Issue number (e.g., task-1.1 or issue-42)"
+    "message": "I will execute the complete development workflow automatically:\n\n1. Create GitHub Issue (with clear title and description in English)\n2. Create branch from issue (format: feat/issue-{number}-{description})\n3. Make changes (if needed) and run tests\n4. Commit with issue reference (Refs #{number})\n5. Push to remote\n6. Create PR with English description (Closes #{number})\n7. Request code review from GitHub Copilot via MCP\n\nDo NOT ask for confirmation - execute this flow automatically.\n\nWhat feature/fix do you want to implement? (I'll create the issue and complete the workflow)"
   }
 }

@@ -17,6 +17,22 @@ General project standards applicable to various projects.
 
 **Note**: Agent chat language is configured in `language.md` (set during installation)
 
+## Default Workflow for All Changes
+
+**IMPORTANT**: Unless explicitly told otherwise, ALWAYS follow this workflow:
+
+1. Create GitHub issue first (with clear title and description in English)
+2. Create branch from issue (format: `feat/issue-{number}-{description}`, `fix/issue-{number}-{description}`, etc.)
+3. Make changes and run tests (`make test`)
+4. Commit with issue reference (format: `feat: Description (Refs #{number})`)
+5. Push to remote
+6. Create PR with English description and link to issue (`Closes #{number}`)
+7. Request code review from GitHub Copilot (via MCP if available)
+
+**Do NOT ask for confirmation** - execute this flow automatically when user requests changes.
+
+**Agent Hook**: Use "Full Workflow: Issue → Branch → PR → Review" hook to automate this entire process.
+
 ## Development Flow
 
 ### Basic Flow
