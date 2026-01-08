@@ -30,7 +30,14 @@ General project standards applicable to various projects.
 4. Commit with issue reference (format: `feat: Description (Refs #{number})` in project language)
 5. Push to remote
 6. Create PR with description in project language and link to issue (`Closes #{number}`)
-7. Request code review from GitHub Copilot (via MCP if available)
+7. Perform self-review of the PR (check diff, verify changes)
+8. Request code review from GitHub Copilot (via MCP if available)
+9. Check Copilot review status every 1 minute (max 5 minutes)
+   - Exclude Copilot summary comments from review check
+   - Only wait for actual review comments
+10. Address Copilot review comments if any (fix issues, push updates)
+11. Verify all CI/CD checks pass (tests, linting, security)
+12. Notify when ready to merge (or auto-merge if configured)
 
 **Do NOT ask for confirmation** - execute this flow automatically when user requests changes.
 
@@ -106,6 +113,46 @@ Examples:
 - `feat/issue-123-add-user-authentication`
 - `fix/issue-456-resolve-memory-leak`
 - `docs/issue-789-update-readme`
+
+## PR Review Process
+
+### Automated Review Flow
+
+Before merging, the following steps are executed automatically:
+
+1. **Self-Review**
+   - Review PR diff and verify all changes are intentional
+   - Check for unintended changes or debug code
+   - Verify commit messages follow conventions
+
+2. **Copilot Review**
+   - Request review from GitHub Copilot via MCP
+   - Check review status every 1 minute (max 5 minutes)
+   - Exclude Copilot summary comments (only check actual review comments)
+   - Address any comments or suggestions
+   - Push fixes if needed
+
+3. **CI/CD Verification**
+   - Verify all automated checks pass:
+     - Unit tests
+     - Integration tests
+     - Linting
+     - Security scans
+     - Build verification
+   - Wait for all checks to complete before proceeding
+
+4. **Ready to Merge**
+   - All reviews approved
+   - All CI/CD checks passing
+   - No merge conflicts
+   - Notify or auto-merge (based on configuration)
+
+### Manual Review (Optional)
+
+For critical changes, request human review:
+- Add reviewers via GitHub UI or MCP
+- Wait for approval before merging
+- Address feedback and update PR
 
 ## Bug Fix Workflow
 
